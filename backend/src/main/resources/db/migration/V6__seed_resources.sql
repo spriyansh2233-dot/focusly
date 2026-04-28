@@ -1,0 +1,5 @@
+INSERT INTO learning_resources (id, title, url, resource_type, source, estimated_duration_minutes, quality_rating, summary, created_at) VALUES 
+(RANDOM_UUID(), 'React Hooks — Official Documentation', 'https://react.dev/reference/react', 'article', 'React.dev', 20, 0.98, 'The definitive reference for all built-in React Hooks with interactive examples.', CURRENT_TIMESTAMP),
+(RANDOM_UUID(), 'Spring Security JWT Tutorial', 'https://www.baeldung.com/spring-security-oauth-jwt', 'article', 'Baeldung', 35, 0.92, 'Step-by-step guide to implementing JWT authentication with Spring Security.', CURRENT_TIMESTAMP),
+(RANDOM_UUID(), 'React Hooks Crash Course', 'https://www.youtube.com/watch?v=TNhaISOUy6Q', 'video', 'YouTube', 45, 0.89, 'Complete crash course covering useState, useEffect, useContext, and custom hooks.', CURRENT_TIMESTAMP),
+(RANDOM_UUID(), 'Spaced Repetition Guide', 'https://ncase.me/remember/', 'article', 'ncase.me', 15, 0.95, 'An interactive essay on how spaced repetition works and why it''s so powerful for learning.', CURRENT_TIMESTAMP);

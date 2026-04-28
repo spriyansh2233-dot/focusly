@@ -1,0 +1,42 @@
+# dependencies
+node_modules/
+.next/
+out/
+build/
+
+# backend artifacts
+target/
+*.class
+*.log
+*.jar
+*.war
+
+# environment / secrets
+.env
+.env*.local
+application-local.yml
+*.pem
+*.key
+
+# local database files
+data/
+*.db
+*.mv.db
+*.trace.db
+
+# IDE configs
+.idea/
+.vscode/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# system
+.DS_Store
+Thumbs.db
+
+# JDK local folders
+jdk21/
+*.zip

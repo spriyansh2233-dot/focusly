@@ -1,0 +1,1026 @@
+Tech Stack Recommendation: Focusly (2026)
+Revised with Spring Boot + SQL
+Overview Architecture
+Frontend (Next.js) → API Gateway → Spring Boot Backend
+                                        ↓
+                    ┌──────────────────────────────────┐
+                    │   Spring Boot Services           │
+                    ├──────────────────────────────────┤
+                    │ • REST Controllers               │
+                    │ • AI Service Integration         │
+                    │ • Quiz Scheduler (Spring Batch)  │
+                    │ • WebSocket Handler              │
+                    └──────────────────────────────────┘
+                                ↓
+        ┌───────────────────────────────────────┐
+        │     Data Layer                        │
+        ├───────────────────────────────────────┤
+        │ PostgreSQL + Redis Cache              │
+        └───────────────────────────────────────┘
+
+🎨 Frontend Stack (Unchanged)
+Next.js 15+ (React 19) + Tailwind CSS + shadcn/ui
+
+Server Components for performance
+Streaming UI for AI responses
+Mobile-first design system
+Same reasoning as before
+
+
+⚙️ Backend Stack: Spring Boot 3.2+
+Why Spring Boot for Focusly:
+✅ Enterprise-Grade Stability
+
+Battle-tested for high-traffic applications
+Excellent for the 99.9% uptime SLA requirement
+Mature ecosystem with proven design patterns
+
+✅ Strong Type Safety
+
+Java's static typing prevents runtime errors in quiz generation logic
+Compile-time checks for spaced repetition algorithms
+Better IDE support (IntelliJ IDEA) = faster debugging
+
+✅ Excellent SQL Integration
+
+Spring Data JPA = clean ORM for relational data
+Native query support for complex analytics queries
+Transaction management out-of-the-box
+
+✅ Robust Scheduling
+
+Spring Batch for spaced repetition scheduling
+Cron jobs for daily quiz generation
+Quartz Scheduler integration
+
+✅ AI Integration Capabilities
+
+RestTemplate/WebClient for LLM API calls
+Spring AI (new in 2024) for simplified AI integration
+Easy to wrap Python ML services via REST
+
+
+🏗️ Spring Boot Architecture
+Project Structure
+focusly/
+├── src/main/java/com/learning/
+│   ├── controller/          # REST endpoints
+│   ├── service/             # Business logic
+│   ├── repository/          # Data access
+│   ├── model/               # JPA entities
+│   ├── dto/                 # Request/Response objects
+│   ├── config/              # Spring configuration
+│   ├── scheduler/           # Spaced repetition jobs
+│   ├── websocket/           # Real-time features
+│   └── ai/                  # AI service integration
+├── src/main/resources/
+│   ├── application.yml      # Configuration
+│   └── db/migration/        # Flyway SQL scripts
+└── pom.xml                  # Dependencies
+
+📦 Core Dependencies (pom.xml)
+xml<dependencies>
+    <!-- Spring Boot Starters -->
+    <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-web</artifactId>
+    </dependency>
+    
+    <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-data-jpa</artifactId>
+    </dependency>
+    
+    <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-security</artifactId>
+    </dependency>
+    
+    <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-websocket</artifactId>
+    </dependency>
+    
+    <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-cache</artifactId>
+    </dependency>
+    
+    <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-batch</artifactId>
+    </dependency>
+    
+    <!-- Database -->
+    <dependency>
+        <groupId>org.postgresql</groupId>
+        <artifactId>postgresql</artifactId>
+    </dependency>
+    
+    <dependency>
+        <groupId>org.flywaydb</groupId>
+        <artifactId>flyway-core</artifactId>
+    </dependency>
+    
+    <!-- Redis Cache -->
+    <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-data-redis</artifactId>
+    </dependency>
+    
+    <!-- AI Integration -->
+    <dependency>
+        <groupId>org.springframework.ai</groupId>
+        <artifactId>spring-ai-openai-spring-boot-starter</artifactId>
+        <version>1.0.0-M1</version>
+    </dependency>
+    
+    <!-- HTTP Client for LLM APIs -->
+    <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-webflux</artifactId>
+    </dependency>
+    
+    <!-- JSON Processing -->
+    <dependency>
+        <groupId>com.fasterxml.jackson.core</groupId>
+        <artifactId>jackson-databind</artifactId>
+    </dependency>
+    
+    <!-- Validation -->
+    <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-validation</artifactId>
+    </dependency>
+    
+    <!-- Lombok (reduce boilerplate) -->
+    <dependency>
+        <groupId>org.projectlombok</groupId>
+        <artifactId>lombok</artifactId>
+        <optional>true</optional>
+    </dependency>
+    
+    <!-- Testing -->
+    <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-test</artifactId>
+        <scope>test</scope>
+    </dependency>
+</dependencies>
+
+🗄️ Database: PostgreSQL 16+
+Why PostgreSQL:
+
+ACID Compliance: Critical for user progress tracking
+JSONB Support: Store flexible learning pathway schemas
+Full-Text Search: Resource discovery (Feature 5)
+Excellent Spring Data JPA Support: Auto-generate CRUD operations
+Mature Ecosystem: pgAdmin, monitoring tools
+
+
+📊 Database Schema Design
+Core Tables
+sql-- Users table
+CREATE TABLE users (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    email VARCHAR(255) UNIQUE NOT NULL,
+    username VARCHAR(100) NOT NULL,
+    password_hash VARCHAR(255) NOT NULL,
+    learning_style VARCHAR(50), -- visual, reading, hands-on
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Concepts/Topics
+CREATE TABLE concepts (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    name VARCHAR(255) NOT NULL,
+    subject VARCHAR(100) NOT NULL,
+    description TEXT,
+    difficulty_level DECIMAL(3,2), -- 0.0 to 1.0
+    prerequisites JSONB, -- array of prerequisite concept IDs
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Learning Paths
+CREATE TABLE learning_paths (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+    goal_description TEXT,
+    pathway JSONB NOT NULL, -- graph structure of concepts
+    current_week INT DEFAULT 1,
+    target_completion_date DATE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- User Progress Tracking
+CREATE TABLE user_progress (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+    concept_id UUID REFERENCES concepts(id) ON DELETE CASCADE,
+    mastery_level VARCHAR(20) CHECK (mastery_level IN ('learning', 'reviewing', 'mastered')),
+    last_reviewed_at TIMESTAMP,
+    next_review_at TIMESTAMP,
+    review_count INT DEFAULT 0,
+    ease_factor DECIMAL(3,2) DEFAULT 2.5, -- for spaced repetition
+    interval_days INT DEFAULT 1,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(user_id, concept_id)
+);
+
+-- Quiz Questions
+CREATE TABLE quiz_questions (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    concept_id UUID REFERENCES concepts(id),
+    question_text TEXT NOT NULL,
+    question_type VARCHAR(50), -- multiple_choice, short_answer, application
+    options JSONB, -- for multiple choice: ["A", "B", "C", "D"]
+    correct_answer TEXT NOT NULL,
+    difficulty DECIMAL(3,2),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Quiz Attempts
+CREATE TABLE quiz_attempts (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+    question_id UUID REFERENCES quiz_questions(id),
+    user_answer TEXT,
+    is_correct BOOLEAN,
+    time_spent_seconds INT,
+    attempted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Learning Resources
+CREATE TABLE learning_resources (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    concept_id UUID REFERENCES concepts(id),
+    title VARCHAR(500) NOT NULL,
+    url TEXT NOT NULL,
+    resource_type VARCHAR(50), -- video, article, tutorial, paper
+    source VARCHAR(100), -- YouTube, Khan Academy, etc.
+    difficulty_level DECIMAL(3,2),
+    estimated_duration_minutes INT,
+    quality_rating DECIMAL(3,2), -- AI-generated or user ratings
+    summary TEXT, -- AI-generated summary
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- User Study Sessions
+CREATE TABLE study_sessions (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+    concept_id UUID REFERENCES concepts(id),
+    session_type VARCHAR(50), -- review, learn, practice, tutor
+    duration_minutes INT,
+    started_at TIMESTAMP NOT NULL,
+    ended_at TIMESTAMP,
+    notes TEXT
+);
+
+-- AI Tutor Conversations
+CREATE TABLE tutor_conversations (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+    concept_id UUID REFERENCES concepts(id),
+    messages JSONB NOT NULL, -- [{role: "user", content: "..."}, {role: "assistant", ...}]
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Indexes for performance
+CREATE INDEX idx_user_progress_user_id ON user_progress(user_id);
+CREATE INDEX idx_user_progress_next_review ON user_progress(next_review_at) 
+    WHERE mastery_level IN ('learning', 'reviewing');
+CREATE INDEX idx_quiz_attempts_user_id ON quiz_attempts(user_id);
+CREATE INDEX idx_study_sessions_user_id ON study_sessions(user_id);
+CREATE INDEX idx_concepts_subject ON concepts(subject);
+
+🔧 Spring Boot Implementation Examples
+1. JPA Entity Models
+java@Entity
+@Table(name = "users")
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class User {
+    @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
+    
+    @Column(unique = true, nullable = false)
+    private String email;
+    
+    @Column(nullable = false)
+    private String username;
+    
+    @Column(name = "password_hash")
+    private String passwordHash;
+    
+    @Enumerated(EnumType.STRING)
+    @Column(name = "learning_style")
+    private LearningStyle learningStyle;
+    
+    @CreatedDate
+    @Column(name = "created_at")
+    private LocalDateTime createdAt;
+    
+    @LastModifiedDate
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
+}
+
+@Entity
+@Table(name = "user_progress")
+@Data
+public class UserProgress {
+    @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
+    
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private User user;
+    
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "concept_id")
+    private Concept concept;
+    
+    @Enumerated(EnumType.STRING)
+    @Column(name = "mastery_level")
+    private MasteryLevel masteryLevel;
+    
+    @Column(name = "next_review_at")
+    private LocalDateTime nextReviewAt;
+    
+    @Column(name = "ease_factor")
+    private Double easeFactor = 2.5;
+    
+    @Column(name = "interval_days")
+    private Integer intervalDays = 1;
+    
+    @Column(name = "review_count")
+    private Integer reviewCount = 0;
+}
+
+2. Repository Layer (Spring Data JPA)
+java@Repository
+public interface UserProgressRepository extends JpaRepository<UserProgress, UUID> {
+    
+    List<UserProgress> findByUserId(UUID userId);
+    
+    @Query("SELECT up FROM UserProgress up WHERE up.nextReviewAt <= :now " +
+           "AND up.masteryLevel IN ('LEARNING', 'REVIEWING')")
+    List<UserProgress> findDueForReview(@Param("now") LocalDateTime now);
+    
+    @Query("SELECT up FROM UserProgress up WHERE up.user.id = :userId " +
+           "AND up.masteryLevel = 'MASTERED'")
+    List<UserProgress> findMasteredConcepts(@Param("userId") UUID userId);
+    
+    Optional<UserProgress> findByUserIdAndConceptId(UUID userId, UUID conceptId);
+}
+
+@Repository
+public interface QuizQuestionRepository extends JpaRepository<QuizQuestion, UUID> {
+    
+    List<QuizQuestion> findByConceptId(UUID conceptId);
+    
+    @Query("SELECT q FROM QuizQuestion q WHERE q.conceptId = :conceptId " +
+           "AND q.difficulty BETWEEN :minDiff AND :maxDiff " +
+           "ORDER BY RANDOM() LIMIT :limit")
+    List<QuizQuestion> findAdaptiveQuestions(
+        @Param("conceptId") UUID conceptId,
+        @Param("minDiff") Double minDiff,
+        @Param("maxDiff") Double maxDiff,
+        @Param("limit") int limit
+    );
+}
+
+3. Service Layer
+java@Service
+@Transactional
+public class LearningPathService {
+    
+    @Autowired
+    private UserProgressRepository progressRepository;
+    
+    @Autowired
+    private ConceptRepository conceptRepository;
+    
+    @Autowired
+    private SpacedRepetitionService spacedRepService;
+    
+    /**
+     * Generate personalized learning path based on user assessment
+     */
+    public LearningPath generateLearningPath(UUID userId, String subject, 
+                                             AssessmentResult assessment) {
+        // Get all concepts for subject
+        List<Concept> allConcepts = conceptRepository.findBySubject(subject);
+        
+        // Filter out already mastered concepts
+        Set<UUID> masteredIds = progressRepository.findMasteredConcepts(userId)
+            .stream()
+            .map(up -> up.getConcept().getId())
+            .collect(Collectors.toSet());
+        
+        List<Concept> remainingConcepts = allConcepts.stream()
+            .filter(c -> !masteredIds.contains(c.getId()))
+            .collect(Collectors.toList());
+        
+        // Sort by prerequisites and difficulty
+        List<Concept> orderedPath = topologicalSort(remainingConcepts);
+        
+        // Create weekly milestones
+        LearningPath path = new LearningPath();
+        path.setUserId(userId);
+        path.setPathway(buildPathwayJson(orderedPath));
+        
+        return learningPathRepository.save(path);
+    }
+    
+    /**
+     * Update progress after quiz attempt
+     */
+    public void updateProgress(UUID userId, UUID conceptId, boolean isCorrect) {
+        UserProgress progress = progressRepository
+            .findByUserIdAndConceptId(userId, conceptId)
+            .orElseGet(() -> createNewProgress(userId, conceptId));
+        
+        // Apply spaced repetition algorithm
+        SpacedRepetitionResult result = spacedRepService
+            .calculateNextReview(progress, isCorrect);
+        
+        progress.setEaseFactor(result.getEaseFactor());
+        progress.setIntervalDays(result.getIntervalDays());
+        progress.setNextReviewAt(result.getNextReviewDate());
+        progress.setReviewCount(progress.getReviewCount() + 1);
+        
+        // Update mastery level
+        if (progress.getReviewCount() >= 5 && result.getIntervalDays() >= 30) {
+            progress.setMasteryLevel(MasteryLevel.MASTERED);
+        } else if (progress.getReviewCount() >= 2) {
+            progress.setMasteryLevel(MasteryLevel.REVIEWING);
+        }
+        
+        progressRepository.save(progress);
+    }
+}
+
+4. AI Service Integration
+java@Service
+public class AITutorService {
+    
+    @Value("${anthropic.api.key}")
+    private String anthropicApiKey;
+    
+    private final WebClient webClient;
+    
+    public AITutorService(WebClient.Builder webClientBuilder) {
+        this.webClient = webClientBuilder
+            .baseUrl("https://api.anthropic.com")
+            .build();
+    }
+    
+    /**
+     * Get AI explanation for a concept
+     */
+    public String explainConcept(String concept, String learningStyle, 
+                                 String userLevel) {
+        
+        String prompt = buildExplanationPrompt(concept, learningStyle, userLevel);
+        
+        ClaudeRequest request = ClaudeRequest.builder()
+            .model("claude-sonnet-4-20250514")
+            .maxTokens(1024)
+            .messages(List.of(
+                new Message("user", prompt)
+            ))
+            .build();
+        
+        ClaudeResponse response = webClient.post()
+            .uri("/v1/messages")
+            .header("x-api-key", anthropicApiKey)
+            .header("anthropic-version", "2023-06-01")
+            .bodyValue(request)
+            .retrieve()
+            .bodyToMono(ClaudeResponse.class)
+            .block();
+        
+        return response.getContent().get(0).getText();
+    }
+    
+    /**
+     * Generate adaptive quiz questions
+     */
+    public List<QuizQuestion> generateQuiz(UUID conceptId, double difficulty) {
+        Concept concept = conceptRepository.findById(conceptId)
+            .orElseThrow(() -> new ResourceNotFoundException("Concept not found"));
+        
+        String prompt = String.format(
+            "Generate 5 %s-level quiz questions about %s. " +
+            "Return as JSON array with fields: question, options, correctAnswer, explanation",
+            getDifficultyLabel(difficulty),
+            concept.getName()
+        );
+        
+        String aiResponse = callClaudeAPI(prompt);
+        
+        // Parse JSON and convert to QuizQuestion entities
+        return parseQuizQuestionsFromJson(aiResponse, conceptId);
+    }
+    
+    private String buildExplanationPrompt(String concept, String style, 
+                                         String level) {
+        return String.format(
+            "Explain %s to a %s student. " +
+            "Use a %s learning approach (e.g., %s). " +
+            "Include an analogy and a practical example.",
+            concept,
+            level,
+            style,
+            getStyleGuidance(style)
+        );
+    }
+}
+
+5. Spaced Repetition Algorithm
+java@Service
+public class SpacedRepetitionService {
+    
+    /**
+     * SM-2 Algorithm implementation
+     * Returns next review date and updated ease factor
+     */
+    public SpacedRepetitionResult calculateNextReview(
+        UserProgress progress, boolean isCorrect) {
+        
+        double easeFactor = progress.getEaseFactor();
+        int interval = progress.getIntervalDays();
+        
+        if (isCorrect) {
+            // Increase interval
+            if (interval == 1) {
+                interval = 6;
+            } else {
+                interval = (int) Math.round(interval * easeFactor);
+            }
+            
+            // Adjust ease factor slightly up
+            easeFactor = Math.min(2.5, easeFactor + 0.1);
+            
+        } else {
+            // Reset to beginning
+            interval = 1;
+            easeFactor = Math.max(1.3, easeFactor - 0.2);
+        }
+        
+        LocalDateTime nextReview = LocalDateTime.now().plusDays(interval);
+        
+        return SpacedRepetitionResult.builder()
+            .easeFactor(easeFactor)
+            .intervalDays(interval)
+            .nextReviewDate(nextReview)
+            .build();
+    }
+}
+
+6. REST Controllers
+java@RestController
+@RequestMapping("/api/v1/quiz")
+public class QuizController {
+    
+    @Autowired
+    private QuizService quizService;
+    
+    @Autowired
+    private LearningPathService learningPathService;
+    
+    /**
+     * Get today's review quiz for user
+     */
+    @GetMapping("/daily")
+    public ResponseEntity<QuizResponse> getDailyQuiz(
+        @AuthenticationPrincipal User user) {
+        
+        List<UserProgress> dueReviews = quizService
+            .getDueReviews(user.getId());
+        
+        List<QuizQuestion> questions = quizService
+            .generateAdaptiveQuiz(dueReviews);
+        
+        return ResponseEntity.ok(
+            QuizResponse.builder()
+                .questions(questions)
+                .totalQuestions(questions.size())
+                .build()
+        );
+    }
+    
+    /**
+     * Submit quiz answer
+     */
+    @PostMapping("/submit")
+    public ResponseEntity<SubmissionResult> submitAnswer(
+        @AuthenticationPrincipal User user,
+        @Valid @RequestBody QuizSubmission submission) {
+        
+        boolean isCorrect = quizService.checkAnswer(
+            submission.getQuestionId(),
+            submission.getUserAnswer()
+        );
+        
+        // Update progress with spaced repetition
+        learningPathService.updateProgress(
+            user.getId(),
+            submission.getConceptId(),
+            isCorrect
+        );
+        
+        return ResponseEntity.ok(
+            SubmissionResult.builder()
+                .isCorrect(isCorrect)
+                .explanation(quizService.getExplanation(submission.getQuestionId()))
+                .nextReviewIn(quizService.getNextReviewInterval(user.getId()))
+                .build()
+        );
+    }
+}
+
+@RestController
+@RequestMapping("/api/v1/tutor")
+public class AITutorController {
+    
+    @Autowired
+    private AITutorService tutorService;
+    
+    /**
+     * Ask AI tutor a question
+     */
+    @PostMapping("/ask")
+    public ResponseEntity<TutorResponse> askQuestion(
+        @AuthenticationPrincipal User user,
+        @Valid @RequestBody TutorRequest request) {
+        
+        String explanation = tutorService.explainConcept(
+            request.getConcept(),
+            user.getLearningStyle().toString(),
+            request.getUserLevel()
+        );
+        
+        return ResponseEntity.ok(
+            TutorResponse.builder()
+                .explanation(explanation)
+                .timestamp(LocalDateTime.now())
+                .build()
+        );
+    }
+}
+
+7. Scheduled Jobs (Spaced Repetition)
+java@Configuration
+@EnableScheduling
+public class ScheduledTasks {
+    
+    @Autowired
+    private QuizService quizService;
+    
+    @Autowired
+    private NotificationService notificationService;
+    
+    /**
+     * Run daily at 8 AM - send review reminders
+     */
+    @Scheduled(cron = "0 0 8 * * ?")
+    public void sendDailyReviewReminders() {
+        List<User> usersWithDueReviews = quizService
+            .getUsersWithPendingReviews();
+        
+        usersWithDueReviews.forEach(user -> {
+            int dueCount = quizService.getDueReviewCount(user.getId());
+            notificationService.sendPushNotification(
+                user.getId(),
+                String.format("You have %d concepts ready to review!", dueCount)
+            );
+        });
+    }
+    
+    /**
+     * Generate weekly progress reports
+     */
+    @Scheduled(cron = "0 0 9 * * SUN")
+    public void generateWeeklyReports() {
+        // Implementation for Feature 4: Progress Analytics
+    }
+}
+
+8. WebSocket for Real-Time Features
+java@Configuration
+@EnableWebSocketMessageBroker
+public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
+    
+    @Override
+    public void configureMessageBroker(MessageBrokerRegistry config) {
+        config.enableSimpleBroker("/topic");
+        config.setApplicationDestinationPrefixes("/app");
+    }
+    
+    @Override
+    public void registerStompEndpoints(StompEndpointRegistry registry) {
+        registry.addEndpoint("/ws")
+            .setAllowedOrigins("*")
+            .withSockJS();
+    }
+}
+
+@Controller
+public class QuizWebSocketController {
+    
+    @MessageMapping("/quiz/start")
+    @SendToUser("/topic/quiz")
+    public QuizSession startQuiz(Principal principal) {
+        // Real-time quiz session
+        return quizService.createSession(principal.getName());
+    }
+}
+
+🔐 Authentication & Authorization
+Option 1: Spring Security + JWT (Recommended for Spring Boot)
+java@Configuration
+@EnableWebSecurity
+public class SecurityConfig {
+    
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        http
+            .csrf().disable()
+            .authorizeHttpRequests(auth -> auth
+                .requestMatchers("/api/public/**").permitAll()
+                .requestMatchers("/api/v1/**").authenticated()
+            )
+            .sessionManagement(session -> session
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+            )
+            .addFilterBefore(jwtAuthenticationFilter(), 
+                UsernamePasswordAuthenticationFilter.class);
+        
+        return http.build();
+    }
+    
+    @Bean
+    public JwtAuthenticationFilter jwtAuthenticationFilter() {
+        return new JwtAuthenticationFilter();
+    }
+}
+
+@Component
+public class JwtTokenProvider {
+    
+    @Value("${jwt.secret}")
+    private String jwtSecret;
+    
+    public String generateToken(User user) {
+        return Jwts.builder()
+            .setSubject(user.getId().toString())
+            .setIssuedAt(new Date())
+            .setExpiration(new Date(System.currentTimeMillis() + 86400000)) // 24h
+            .signWith(SignatureAlgorithm.HS512, jwtSecret)
+            .compact();
+    }
+    
+    public UUID getUserIdFromToken(String token) {
+        Claims claims = Jwts.parser()
+            .setSigningKey(jwtSecret)
+            .parseClaimsJws(token)
+            .getBody();
+        
+        return UUID.fromString(claims.getSubject());
+    }
+}
+
+Option 2: Integrate with Clerk (Easier for MVP)
+java@Configuration
+public class ClerkSecurityConfig {
+    
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        http
+            .authorizeHttpRequests(auth -> auth
+                .requestMatchers("/api/public/**").permitAll()
+                .anyRequest().authenticated()
+            )
+            .oauth2ResourceServer(oauth2 -> oauth2
+                .jwt(jwt -> jwt.decoder(jwtDecoder()))
+            );
+        
+        return http.build();
+    }
+    
+    @Bean
+    public JwtDecoder jwtDecoder() {
+        // Clerk JWT verification
+        return NimbusJwtDecoder
+            .withJwkSetUri("https://clerk.your-app.com/.well-known/jwks.json")
+            .build();
+    }
+}
+
+🚀 Caching with Redis
+java@Configuration
+@EnableCaching
+public class CacheConfig {
+    
+    @Bean
+    public RedisCacheManager cacheManager(RedisConnectionFactory connectionFactory) {
+        RedisCacheConfiguration config = RedisCacheConfiguration.defaultCacheConfig()
+            .entryTtl(Duration.ofHours(1))
+            .serializeValuesWith(
+                RedisSerializationContext.SerializationPair
+                    .fromSerializer(new GenericJackson2JsonRedisSerializer())
+            );
+        
+        return RedisCacheManager.builder(connectionFactory)
+            .cacheDefaults(config)
+            .build();
+    }
+}
+
+@Service
+public class QuizService {
+    
+    @Cacheable(value = "dailyQuiz", key = "#userId")
+    public List<QuizQuestion> getDailyQuiz(UUID userId) {
+        // Expensive operation - cached for 1 hour
+        return quizRepository.generateDailyQuiz(userId);
+    }
+    
+    @CacheEvict(value = "dailyQuiz", key = "#userId")
+    public void invalidateQuizCache(UUID userId) {
+        // Called after user completes quiz
+    }
+}
+
+📈 Performance Optimizations
+1. Connection Pooling
+yaml# application.yml
+spring:
+  datasource:
+    hikari:
+      maximum-pool-size: 20
+      minimum-idle: 5
+      connection-timeout: 30000
+      idle-timeout: 600000
+      max-lifetime: 1800000
+2. Query Optimization
+java// Use JOIN FETCH to avoid N+1 queries
+@Query("SELECT up FROM UserProgress up " +
+       "JOIN FETCH up.concept " +
+       "WHERE up.user.id = :userId")
+List<UserProgress> findByUserIdWithConcepts(@Param("userId") UUID userId);
+3. Pagination
+java@GetMapping("/progress")
+public Page<UserProgressDTO> getProgress(
+    @AuthenticationPrincipal User user,
+    @PageableDefault(size = 20, sort = "nextReviewAt") Pageable pageable) {
+    
+    return progressRepository
+        .findByUserId(user.getId(), pageable)
+        .map(this::toDTO);
+}
+
+☁️ Deployment Stack
+Backend Hosting Options:
+Option 1: Railway (Easiest for MVP)
+
+One-click Spring Boot deployment
+Built-in PostgreSQL + Redis
+Auto-scaling
+~$20/month for small apps
+
+Option 2: AWS Elastic Beanstalk
+
+Upload JAR file, auto-deploys
+Integrated with RDS (PostgreSQL) and ElastiCache (Redis)
+More control than Railway
+~$50/month minimum
+
+Option 3: Self-Hosted (DigitalOcean/Hetzner)
+
+Docker container on VPS
+Cheapest option (~$12/month)
+Requires DevOps knowledge
+
+
+🔧 Configuration Files
+application.yml
+yamlspring:
+  application:
+    name: focusly
+  
+  datasource:
+    url: jdbc:postgresql://localhost:5432/learning_db
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+  
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+  
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+  
+  redis:
+    host: ${REDIS_HOST:localhost}
+    port: ${REDIS_PORT:6379}
+  
+  cache:
+    type: redis
+    redis:
+      time-to-live: 3600000 # 1 hour
+
+# AI Service Configuration
+anthropic:
+  api:
+    key: ${ANTHROPIC_API_KEY}
+    
+openai:
+  api:
+    key: ${OPENAI_API_KEY}
+
+# JWT Configuration
+jwt:
+  secret: ${JWT_SECRET}
+  expiration: 86400000 # 24 hours
+
+# Application Settings
+app:
+  quiz:
+    daily-limit: 50
+    review-threshold-hours: 24
+  
+  spaced-repetition:
+    initial-interval-days: 1
+    default-ease-factor: 2.5
+
+logging:
+  level:
+    com.learning: DEBUG
+    org.springframework: INFO
+
+📦 Complete Tech Stack Summary
+LayerTechnologyJustificationFrontendNext.js 15 + React 19SSR, streaming UI, best DXStylingTailwind + shadcn/uiFast dev, mobile-firstBackendSpring Boot 3.2+Enterprise stability, SQL integration, schedulingLanguageJava 17+Type safety, mature ecosystemDatabasePostgreSQL 16ACID, JSONB, full-text searchCacheRedisSession storage, quiz cachingAuthSpring Security + JWT or ClerkFlexible, secureORMSpring Data JPAAuto CRUD, clean queriesMigrationFlywayVersion-controlled schema changesAI IntegrationSpring AI + WebClientCall Claude/OpenAI APIsSchedulingSpring Batch + @ScheduledSpaced repetition jobsWebSocketSpring WebSocketReal-time quiz updatesTestingJUnit 5 + MockitoUnit & integration testsBuild ToolMaven or GradleDependency managementHostingRailway or AWS EBEasy deploy, auto-scaleMonitoringSpring Boot Actuator + SentryHealth checks, error tracking
+
+💰 Estimated Costs (Spring Boot Stack)
+For 1,000 users (MVP):
+
+Railway (Backend + PostgreSQL + Redis): $25/month
+Vercel (Frontend): Free
+Clerk Auth: Free tier
+Anthropic API: ~$500/month
+Total: ~$525/month
+
+For 10,000 users (Phase 2):
+
+AWS Elastic Beanstalk: $100/month
+RDS PostgreSQL: $50/month
+ElastiCache Redis: $40/month
+AI APIs: ~$2,500/month
+Total: ~$2,690/month
+
+
+🎯 Immediate Next Steps
+Week 1:
+
+spring init project with dependencies
+Set up PostgreSQL + Flyway migrations
+Create core entities (User, UserProgress, Concept)
+Deploy "Hello World" to Railway
+
+Week 2:
+5. Implement JWT authentication
+6. Build quiz generation service
+7. Create REST endpoints for quiz flow
+Week 3:
+8. Integrate Claude API for tutoring
+9. Implement spaced repetition algorithm
+10. Add Redis caching
+Week 4:
+11. Build analytics dashboard endpoints
+12. Set up scheduled jobs
+13. Load testing with JMeter
+
+✅ Why This Stack Works
+✅ Type Safety: Java catches bugs at compile-time
+✅ SQL First-Class: Spring Data JPA = clean ORM
+✅ Battle-Tested: Spring Boot proven at Netflix, Airbnb scale
+✅ Great Tooling: IntelliJ IDEA, Spring Boot DevTools
+✅ Easy Deployment: Single JAR file, runs anywhere
+✅ Enterprise Ready: Built-in monitoring, health checks
