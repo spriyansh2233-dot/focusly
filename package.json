@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "npm --prefix frontend run dev",
-    "build": "npm --prefix frontend run build",
+    "build": "npm install --prefix frontend && npm run build --prefix frontend",
     "start": "npm --prefix frontend run start",
     "backend": "cd backend && ./mvnw spring-boot:run"
   }
