@@ -4,5 +4,4 @@ COPY backend/ .
 RUN chmod +x mvnw
 RUN ./mvnw clean package -DskipTests
 EXPOSE 8080
-RUN apt-get update && apt-get install -y socat
-CMD ["sh","-c","socat -d -d TCP4-LISTEN:65432,fork,reuseaddr TCP6:[db.wfowipzthkglrxgyayec.supabase.co]:5432 & sleep 10 && java -jar target/*.jar"]
+CMD ["sh","-c","java -jar target/*.jar"]
