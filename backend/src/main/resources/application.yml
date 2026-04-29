@@ -2,12 +2,12 @@ spring:
   application:
     name: focusly
   datasource:
-    url: ${SPRING_DATASOURCE_URL:jdbc:h2:file:./data/ai_copilot_db;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE;MODE=PostgreSQL}
-    driverClassName: ${SPRING_DATASOURCE_DRIVER:org.h2.Driver}
-    username: ${SPRING_DATASOURCE_USERNAME:sa}
-    password: ${SPRING_DATASOURCE_PASSWORD:password}
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://aws-1-ap-south-1.pooler.supabase.com:5432/postgres}
+    driverClassName: ${SPRING_DATASOURCE_DRIVER:org.postgresql.Driver}
+    username: ${SPRING_DATASOURCE_USERNAME:postgres.wfowipzthkglrxgyayec}
+    password: ${SPRING_DATASOURCE_PASSWORD:Priyansh@9977}
   jpa:
-    database-platform: ${SPRING_JPA_DIALECT:org.hibernate.dialect.H2Dialect}
+    database-platform: ${SPRING_JPA_DIALECT:org.hibernate.dialect.PostgreSQLDialect}
     hibernate:
       ddl-auto: update
     show-sql: false
