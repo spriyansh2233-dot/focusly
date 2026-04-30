@@ -48,17 +48,10 @@ public class SecurityConfig {
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers(
-                    "/api/auth/**",
-                    "/api/public/**",
-                    "/h2-console/**",
-                    "/ws/**"
-                ).permitAll()
+                .requestMatchers("/api/auth/**").permitAll()
                 .anyRequest().authenticated()
             );
 
-        // Required for H2 console frames
-        http.headers(headers -> headers.frameOptions(frameOptions -> frameOptions.disable()));
         http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
