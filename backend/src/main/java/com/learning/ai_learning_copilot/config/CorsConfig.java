@@ -16,7 +16,7 @@ public class CorsConfig {
 
                 registry.addMapping("/**")
                         .allowedOrigins(
-                                "https://your-vercel-app.vercel.app"
+                                "https://focusly-ecru.vercel.app"
                         )
                         .allowedMethods("*")
                         .allowedHeaders("*")
