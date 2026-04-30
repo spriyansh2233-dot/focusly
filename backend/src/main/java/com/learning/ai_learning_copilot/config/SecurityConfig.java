@@ -42,13 +42,16 @@ public class SecurityConfig {
     }
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
             .csrf(csrf -> csrf.disable())
-            .cors(cors -> {}) // enable CORS
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/", "/health", "/api/auth/**").permitAll()
+                .requestMatchers(
+                    "/",
+                    "/health",
+                    "/api/auth/**"
+                ).permitAll()
                 .anyRequest().authenticated()
             );
 
