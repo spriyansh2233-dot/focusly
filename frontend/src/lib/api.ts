@@ -1,4 +1,4 @@
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080/api";
+const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
 
 export async function fetchWithAuth(endpoint: string, options: RequestInit = {}) {
   let token = "";
@@ -13,7 +13,7 @@ export async function fetchWithAuth(endpoint: string, options: RequestInit = {})
   };
 
   try {
-    const response = await fetch(`${API_URL}${endpoint}`, { ...options, headers });
+    const response = await fetch(`${API}/api${endpoint}`, { ...options, headers });
     
     if (response.status === 401 || response.status === 403) {
       if (typeof window !== "undefined") {
@@ -62,7 +62,7 @@ export async function getMoodHistory() {
 }
 
 export async function login(email: string, password: string) {
-  const response = await fetch(`${API_URL}/auth/login`, {
+  const response = await fetch(`${API}/api/auth/login`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ email, password }),
@@ -75,7 +75,7 @@ export async function login(email: string, password: string) {
 }
 
 export async function register(username: string, email: string, password: string) {
-  const response = await fetch(`${API_URL}/auth/register`, {
+  const response = await fetch(`${API}/api/auth/register`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ username, email, password }),
@@ -151,7 +151,7 @@ export async function uploadNote(file: File) {
   const formData = new FormData();
   formData.append("file", file);
 
-  const response = await fetch(`${API_URL}/notes/upload`, {
+  const response = await fetch(`${API}/api/notes/upload`, {
     method: "POST",
     headers: {
       "Authorization": `Bearer ${token}`
