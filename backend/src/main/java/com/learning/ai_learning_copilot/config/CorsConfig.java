@@ -16,7 +16,7 @@ public class CorsConfig {
 
                 registry.addMapping("/**")
                         .allowedOrigins(
-                                System.getenv("FRONTEND_URL") != null ? System.getenv("FRONTEND_URL") : "https://focusly-ecru.vercel.app")
+                                "https://focusly-ecru.vercel.app")
                         .allowedMethods("*")
                         .allowedHeaders("*")
                         .allowCredentials(true);
