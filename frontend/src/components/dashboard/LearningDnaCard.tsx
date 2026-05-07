@@ -51,12 +51,11 @@ export function LearningDnaCard() {
     );
   }
 
-  let strongTopics = [];
-  let weakTopics = [];
-  try {
-    strongTopics = JSON.parse(profile.strongestTopics || "[]");
-    weakTopics = JSON.parse(profile.weakTopics || "[]");
-  } catch(e) {}
+  const strongTopics = Array.isArray(profile.strengths) ? profile.strengths : [];
+  const weakTopics = Array.isArray(profile.weaknesses) ? profile.weaknesses : [];
+  const consistencyScore = Math.round((profile.consistencyScore || 0) * 100);
+  const focusSpan = profile.focusSpanMinutes || 0;
+  const bestStudyTime = profile.bestStudyTime || "Morning";
 
   return (
     <Card className="elevated">
@@ -71,13 +70,13 @@ export function LearningDnaCard() {
           <div className="bg-secondary rounded-lg p-3">
             <span className="text-xs text-muted-foreground block mb-1">Best Time to Study</span>
             <span className="font-semibold text-sm flex items-center gap-2">
-              <Icon name="Clock" size={14} className="text-primary" /> {profile.bestStudyTime}
+              <Icon name="Clock" size={14} className="text-primary" /> {bestStudyTime}
             </span>
           </div>
           <div className="bg-secondary rounded-lg p-3">
             <span className="text-xs text-muted-foreground block mb-1">Focus Span</span>
             <span className="font-semibold text-sm flex items-center gap-2">
-              <Icon name="Timer" size={14} className="text-[#10B981]" /> {profile.avgFocusMinutes} min
+              <Icon name="Timer" size={14} className="text-[#10B981]" /> {focusSpan} min
             </span>
           </div>
         </div>
@@ -85,9 +84,9 @@ export function LearningDnaCard() {
         <div>
           <div className="flex justify-between text-sm mb-2">
             <span className="font-medium text-foreground">Consistency Score</span>
-            <span className="text-primary font-bold">{profile.consistencyScore}/100</span>
+            <span className="text-primary font-bold">{consistencyScore}/100</span>
           </div>
-          <Progress value={profile.consistencyScore} className="h-2" />
+          <Progress value={consistencyScore} className="h-2" />
         </div>
 
         <div className="space-y-4">
