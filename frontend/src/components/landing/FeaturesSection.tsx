@@ -1,5 +1,3 @@
-"use client";
-
 import { motion, Variants } from "framer-motion";
 import { Brain, FileText, Calendar, Smile, HelpCircle, BarChart3, Layers, Sparkles } from "lucide-react";
 import { Card } from "@/components/ui/card";

@@ -1,16 +1,14 @@
-"use client";
-
 import { useEffect, useState } from "react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { H3, Body } from "@/components/ui/typography";
 import { Button } from "@/components/ui/button";
 import { getPaths } from "@/lib/api";
 import { ArrowRight, BookOpen, Layers } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { useNavigate } from 'react-router-dom';
 
 export function ActivePathsCard() {
   const [paths, setPaths] = useState<any[]>([]);
-  const router = useRouter();
+  const router = useNavigate();
 
   useEffect(() => {
     getPaths().then(setPaths).catch(() => {});
@@ -39,7 +37,7 @@ export function ActivePathsCard() {
                   <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">
                     Week {path.currentWeek}
                   </span>
-                  <Button variant="link" size="sm" className="h-auto p-0 text-xs font-bold text-primary" onClick={() => router.push(`/learn/path/${path.id}`)}>
+                  <Button variant="link" size="sm" className="h-auto p-0 text-xs font-bold text-primary" onClick={() => router(`/learn/path/${path.id}`)}>
                     View <ArrowRight className="w-3 h-3 ml-1" />
                   </Button>
                 </div>

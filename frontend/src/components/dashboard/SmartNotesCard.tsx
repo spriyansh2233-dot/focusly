@@ -1,19 +1,17 @@
-"use client";
-
 import { useEffect, useState } from "react";
 import { Card } from "@/components/ui/card";
 import { H3 } from "@/components/ui/typography";
 import { FileText, Loader2, Plus, Sparkles, ChevronRight } from "lucide-react";
 import { getNotes } from "@/lib/api";
-import Link from "next/link";
+import { Link } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
-import { useRouter } from "next/navigation";
+import { useNavigate } from 'react-router-dom';
 
 export function SmartNotesCard() {
   const [notes, setNotes] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
-  const router = useRouter();
+  const router = useNavigate();
 
   useEffect(() => {
     const fetchNotes = async () => {
@@ -39,7 +37,7 @@ export function SmartNotesCard() {
           </div>
           <H3>Smart Notes</H3>
         </div>
-        <Link href="/notes" className="text-xs font-semibold text-primary hover:underline flex items-center">
+        <Link to="/notes" className="text-xs font-semibold text-primary hover:underline flex items-center">
           View All <ChevronRight className="w-3 h-3 ml-1" />
         </Link>
       </div>
@@ -55,14 +53,14 @@ export function SmartNotesCard() {
         ) : notes.length === 0 ? (
           <div className="flex-1 flex flex-col items-center justify-center text-center">
             <p className="text-sm text-muted-foreground mb-4">No notes yet.</p>
-            <Button variant="outline" size="sm" onClick={() => router.push("/notes/new")}>
+            <Button variant="outline" size="sm" onClick={() => router("/notes/new")}>
               <Plus className="w-4 h-4 mr-2" /> Create First Note
             </Button>
           </div>
         ) : (
           <div className="space-y-3 flex-1">
             {notes.map((note) => (
-              <div key={note.id} className="flex items-center justify-between p-3 rounded-lg border border-border hover:border-primary/30 hover:bg-primary/5 transition-colors cursor-pointer" onClick={() => router.push(`/notes/${note.id}`)}>
+              <div key={note.id} className="flex items-center justify-between p-3 rounded-lg border border-border hover:border-primary/30 hover:bg-primary/5 transition-colors cursor-pointer" onClick={() => router(`/notes/${note.id}`)}>
                 <div className="flex-1 min-w-0 pr-4">
                   <p className="text-sm font-medium text-foreground truncate">{note.title}</p>
                   <p className="text-xs text-muted-foreground mt-0.5 truncate">{new Date(note.createdAt).toLocaleDateString()}</p>

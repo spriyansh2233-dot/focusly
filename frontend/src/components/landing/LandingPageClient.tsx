@@ -1,5 +1,3 @@
-"use client";
-
 import { LandingNavbar } from "./LandingNavbar";
 import { HeroSection } from "./HeroSection";
 import { FeaturesSection } from "./FeaturesSection";

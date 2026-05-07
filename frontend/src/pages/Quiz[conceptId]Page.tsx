@@ -1,7 +1,5 @@
-"use client";
-
 import { useState, useEffect, useRef } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useNavigate } from 'react-router-dom';
 import { AppLayout } from "@/components/layout/AppLayout";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -58,7 +56,7 @@ type QuizState = "loading" | "answering" | "feedback" | "finished";
 
 export default function QuizPage() {
   const { conceptId } = useParams<{ conceptId: string }>();
-  const router = useRouter();
+  const router = useNavigate();
 
   const questions = MOCK_QUESTIONS[conceptId as string] ?? MOCK_QUESTIONS["react-hooks"];
 
@@ -121,10 +119,10 @@ export default function QuizPage() {
               : "Keep it up! Review the material and try again soon."}
           </Body>
           <div className="flex gap-3 mt-4">
-            <Button variant="ghost" onClick={() => router.push(`/learn/${conceptId}`)}>
+            <Button variant="ghost" onClick={() => router(`/learn/${conceptId}`)}>
               Review Material
             </Button>
-            <Button onClick={() => router.push("/dashboard")}>
+            <Button onClick={() => router("/dashboard")}>
               Back to Dashboard <ArrowRight className="w-4 h-4 ml-2" />
             </Button>
           </div>

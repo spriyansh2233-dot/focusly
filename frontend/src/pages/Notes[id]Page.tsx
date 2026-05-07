@@ -1,13 +1,11 @@
-"use client";
-
 import { useEffect, useState } from "react";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { getNote, updateNote, deleteNote, createNote, summarizeNote } from "@/lib/api";
 import { Loader2, ArrowLeft, Save, Trash2, Sparkles, Copy, Download, Check } from "lucide-react";
-import { useRouter } from "next/navigation";
-import Link from "next/link";
+import { useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import ReactMarkdown from "react-markdown";
 
 export default function NoteEditorPage({ params }: { params: Promise<{ id: string }> }) {
@@ -19,7 +17,7 @@ export default function NoteEditorPage({ params }: { params: Promise<{ id: strin
   const [saving, setSaving] = useState(false);
   const [summarizing, setSummarizing] = useState(false);
   const [copied, setCopied] = useState(false);
-  const router = useRouter();
+  const router = useNavigate();
 
   useEffect(() => {
     params.then((p) => {
@@ -36,7 +34,7 @@ export default function NoteEditorPage({ params }: { params: Promise<{ id: strin
           .catch((err) => {
             console.error(err);
             alert("Note not found");
-            router.push("/notes");
+            router("/notes");
           })
           .finally(() => setLoading(false));
       }
@@ -49,7 +47,7 @@ export default function NoteEditorPage({ params }: { params: Promise<{ id: strin
     try {
       if (id === "new") {
         const newNote = await createNote(title, content);
-        router.replace(`/notes/${newNote.id}`);
+        router(`/notes/${newNote.id}`);
       } else {
         await updateNote(id as string, title, content);
         alert("Saved successfully!");
@@ -66,7 +64,7 @@ export default function NoteEditorPage({ params }: { params: Promise<{ id: strin
     if (!confirm("Are you sure you want to delete this note?")) return;
     try {
       await deleteNote(id as string);
-      router.push("/notes");
+      router("/notes");
     } catch (err) {
       console.error(err);
       alert("Failed to delete");
@@ -112,7 +110,7 @@ export default function NoteEditorPage({ params }: { params: Promise<{ id: strin
     <AppLayout>
       <div className="max-w-7xl mx-auto h-full flex flex-col pb-6">
         <div className="flex items-center justify-between mb-6">
-          <Link href="/notes" className="flex items-center text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
+          <Link to="/notes" className="flex items-center text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
             <ArrowLeft className="w-4 h-4 mr-2" />
             Back to Notes
           </Link>

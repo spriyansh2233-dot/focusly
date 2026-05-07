@@ -1,9 +1,7 @@
-"use client";
-
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import Link from "next/link";
-import Image from "next/image";
+import { Link } from 'react-router-dom';
+
 import { ArrowRight, BrainCircuit, Sparkles, Flame, FileText, Calendar, Smile, HelpCircle, BarChart3, Layers, Clock, Target } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -62,12 +60,12 @@ export function HeroSection() {
           </p>
           
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Link href="/register">
+            <Link to="/register">
               <Button size="lg" className="w-full sm:w-auto h-14 px-10 text-lg rounded-full font-bold shadow-lg shadow-primary/25 hover:scale-105 transition-all">
                 Get Started Free <ArrowRight className="w-5 h-5 ml-2" />
               </Button>
             </Link>
-            <Link href="/login">
+            <Link to="/login">
               <Button variant="ghost" size="lg" className="w-full sm:w-auto h-14 px-10 text-lg rounded-full border border-border hover:bg-muted transition-all">
                 Log In
               </Button>
@@ -90,18 +88,17 @@ export function HeroSection() {
                 return (
                   <g key={`wire-${i}`} className="text-primary/20 dark:text-primary/10">
                     <motion.path
-                      d={`M 0 0 Q ${Math.cos(angle) * (radius/2)} ${Math.sin(angle) * (radius/2)} ${x} ${y}`}
-                      fill="none"
+                      fill="transparent"
                       stroke="currentColor"
-                      strokeWidth="1"
+                      strokeWidth="1.5"
                       strokeDasharray="4 4"
-                      initial={{ pathLength: 0, opacity: 0 }}
+                      d={`M 0 0 Q ${Math.cos(angle) * (radius/2)} ${Math.sin(angle) * (radius/2)} ${x} ${y}`}
                       animate={{ pathLength: 1, opacity: 0.8 }}
                       transition={{ duration: 1, delay: i * 0.05 }}
                     />
-                    <motion.circle r="2.5" fill="currentColor">
+                    <motion.circle r="2.5" className="fill-primary">
                       <animateMotion
-                        dur={`${3 + Math.random() * 2}s`}
+                        dur={`${3 + i * 0.5}s`}
                         repeatCount="indefinite"
                         path={`M 0 0 Q ${Math.cos(angle) * (radius/2)} ${Math.sin(angle) * (radius/2)} ${x} ${y}`}
                       />
@@ -171,8 +168,7 @@ export function HeroSection() {
             >
               <div className="absolute inset-0 bg-primary/20 blur-3xl rounded-full scale-150 animate-pulse" />
               <div className="w-24 h-24 md:w-32 md:h-32 bg-background rounded-full flex items-center justify-center shadow-2xl border-2 border-primary/40 relative z-10 overflow-hidden group">
-                <Image 
-                  src="/logo.png" 
+                <img src="/logo.png" 
                   alt="Focusly Logo" 
                   width={isMobile ? 64 : 80} 
                   height={isMobile ? 64 : 80} 

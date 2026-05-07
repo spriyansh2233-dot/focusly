@@ -2,11 +2,12 @@ import { ReactNode, useEffect, useState } from "react";
 import { Sidebar } from "./Sidebar";
 import { TopNav } from "./TopNav";
 import { MobileNav } from "./MobileNav";
-import { useRouter, usePathname } from "next/navigation";
+import { useNavigate, useLocation } from 'react-router-dom';
 
 export function AppLayout({ children }: { children: ReactNode }) {
-  const router = useRouter();
-  const pathname = usePathname();
+  const router = useNavigate();
+  const location = useLocation();
+  const pathname = location.pathname;
   const [authorized, setAuthorized] = useState(false);
   const [mounted, setMounted] = useState(false);
 
@@ -16,7 +17,7 @@ export function AppLayout({ children }: { children: ReactNode }) {
     const isPublicPage = pathname === "/" || pathname === "/login" || pathname === "/register";
 
     if (!token && !isPublicPage) {
-      router.push("/login");
+      router("/login");
     } else {
       setAuthorized(true);
     }

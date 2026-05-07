@@ -1,7 +1,5 @@
-"use client";
-
-import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { Link } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import { LayoutDashboard, BookOpen, Pencil, BarChart2, Library } from "lucide-react";
 
 const MOBILE_NAV = [
@@ -13,7 +11,8 @@ const MOBILE_NAV = [
 ];
 
 export function MobileNav() {
-  const pathname = usePathname();
+  const location = useLocation();
+  const pathname = location.pathname;
 
   return (
     <nav
@@ -25,7 +24,7 @@ export function MobileNav() {
         return (
           <Link
             key={href}
-            href={href}
+            to={href}
             aria-label={label}
             aria-current={active ? "page" : undefined}
             className={`flex-1 flex flex-col items-center justify-center py-3 gap-0.5 text-[10px] font-medium transition-colors

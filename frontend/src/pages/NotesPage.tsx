@@ -1,5 +1,3 @@
-"use client";
-
 import { useEffect, useState, useRef } from "react";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { Card } from "@/components/ui/card";
@@ -7,8 +5,8 @@ import { Button } from "@/components/ui/button";
 import { H1, Body } from "@/components/ui/typography";
 import { getNotes, uploadNote, searchNotes, createNote } from "@/lib/api";
 import { Plus, Upload, FileText, Search, Loader2 } from "lucide-react";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 export default function NotesPage() {
   const [notes, setNotes] = useState<any[]>([]);
@@ -16,7 +14,7 @@ export default function NotesPage() {
   const [uploading, setUploading] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const router = useRouter();
+  const router = useNavigate();
 
   const loadNotes = () => {
     setLoading(true);
@@ -50,7 +48,7 @@ export default function NotesPage() {
     setUploading(true);
     try {
       const newNote = await uploadNote(file);
-      router.push(`/notes/${newNote.id}`);
+      router(`/notes/${newNote.id}`);
     } catch (err) {
       console.error("Upload failed:", err);
       alert("Failed to upload file. Make sure it's a TXT, PDF, or DOCX.");
@@ -130,7 +128,7 @@ export default function NotesPage() {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {notes.map((note) => (
-              <Link key={note.id} href={`/notes/${note.id}`}>
+              <Link to={`/notes/${note.id}`}>
                 <Card variant="interactive" className="p-5 h-full flex flex-col group">
                   <div className="flex items-start gap-3 mb-3">
                     <div className="w-10 h-10 rounded-lg bg-primary/10 text-primary flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform">

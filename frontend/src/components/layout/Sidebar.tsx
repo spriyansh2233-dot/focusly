@@ -1,7 +1,5 @@
-"use client";
-
-import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { Link } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import { Icon } from "@/components/ui/icon";
 import { motion } from "framer-motion";
 
@@ -16,7 +14,8 @@ const NAV_ITEMS = [
 ];
 
 export function Sidebar() {
-  const pathname = usePathname();
+  const location = useLocation();
+  const pathname = location.pathname;
 
   return (
     <aside className="w-64 flex-shrink-0 border-r border-border bg-card flex flex-col h-full">
@@ -30,7 +29,7 @@ export function Sidebar() {
         {NAV_ITEMS.map(({ href, label, icon }) => {
           const active = pathname === href || pathname.startsWith(href + "/");
           return (
-            <Link key={href} href={href}>
+            <Link to={href}>
               <motion.div
                 whileHover={{ scale: 1.02, x: 4 }}
                 whileTap={{ scale: 0.98 }}
@@ -49,7 +48,7 @@ export function Sidebar() {
         })}
       </nav>
       <div className="p-4 border-t border-border space-y-2">
-        <Link href="/login">
+        <Link to="/login">
           <motion.div
             whileHover={{ scale: 1.02, x: 4 }}
             whileTap={{ scale: 0.98 }}
@@ -60,7 +59,7 @@ export function Sidebar() {
             <span className="relative z-10">Login</span>
           </motion.div>
         </Link>
-        <Link href="/register">
+        <Link to="/register">
           <motion.div
              whileHover={{ scale: 1.02, x: 4 }}
              whileTap={{ scale: 0.98 }}

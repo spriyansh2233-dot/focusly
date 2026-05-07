@@ -1,7 +1,5 @@
-"use client";
-
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useNavigate } from 'react-router-dom';
 import { register } from "@/lib/api";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { Card } from "@/components/ui/card";
@@ -9,14 +7,14 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { H2, Body } from "@/components/ui/typography";
 import { toast } from "sonner";
-import Link from "next/link";
+import { Link } from 'react-router-dom';
 
 export default function RegisterPage() {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
-  const router = useRouter();
+  const router = useNavigate();
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -80,7 +78,7 @@ export default function RegisterPage() {
           
           <div className="mt-6 text-center text-sm">
             Already have an account?{" "}
-            <Link href="/login" className="text-primary hover:underline">
+            <Link to="/login" className="text-primary hover:underline">
               Sign in
             </Link>
           </div>

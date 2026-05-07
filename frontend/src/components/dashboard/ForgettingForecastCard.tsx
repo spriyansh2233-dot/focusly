@@ -1,5 +1,3 @@
-"use client";
-
 import { useEffect, useState } from "react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -8,14 +6,14 @@ import { Icon } from "@/components/ui/icon";
 import { ListSkeleton } from "@/components/ui/skeleton";
 import { EmptyState } from "@/components/ui/empty-state";
 import { getTodayRevisions } from "@/lib/api";
-import { useRouter } from "next/navigation";
+import { useNavigate } from 'react-router-dom';
 import { Brain, AlertCircle, CheckCircle2 } from "lucide-react";
 
 export function ForgettingForecastCard() {
   const [revisions, setRevisions] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
-  const router = useRouter();
+  const router = useNavigate();
 
   useEffect(() => {
     getTodayRevisions()
@@ -78,7 +76,7 @@ export function ForgettingForecastCard() {
                   size="sm"
                   variant="default"
                   className="text-xs h-8 px-4 font-bold"
-                  onClick={() => router.push(`/quiz/${rev.concept?.id ?? "react-hooks"}`)}
+                  onClick={() => router(`/quiz/${rev.concept?.id ?? "react-hooks"}`)}
                 >
                   Review
                 </Button>

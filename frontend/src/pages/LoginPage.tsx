@@ -1,7 +1,5 @@
-"use client";
-
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useNavigate } from 'react-router-dom';
 import { login } from "@/lib/api";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { Card } from "@/components/ui/card";
@@ -9,13 +7,13 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { H2, Body } from "@/components/ui/typography";
 import { toast } from "sonner";
-import Link from "next/link";
+import { Link } from 'react-router-dom';
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
-  const router = useRouter();
+  const router = useNavigate();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -70,7 +68,7 @@ export default function LoginPage() {
           
           <div className="mt-6 text-center text-sm">
             Don't have an account?{" "}
-            <Link href="/register" className="text-primary hover:underline">
+            <Link to="/register" className="text-primary hover:underline">
               Create one
             </Link>
           </div>

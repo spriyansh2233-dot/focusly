@@ -1,6 +1,4 @@
-"use client";
-
-import { useParams, useRouter } from "next/navigation";
+import { useNavigate } from 'react-router-dom';
 import { AppLayout } from "@/components/layout/AppLayout";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -49,7 +47,7 @@ const MOCK_CONCEPTS: Record<string, any> = {
 
 export default function LearnPage() {
   const { conceptId } = useParams<{ conceptId: string }>();
-  const router = useRouter();
+  const router = useNavigate();
   const concept = MOCK_CONCEPTS[conceptId as string] ?? MOCK_CONCEPTS["react-hooks"];
 
   const difficultyLabel = concept.difficulty < 0.4 ? "Beginner" : concept.difficulty < 0.7 ? "Intermediate" : "Advanced";
@@ -70,7 +68,7 @@ export default function LearnPage() {
           </div>
           <Button
             className="gap-2 shrink-0"
-            onClick={() => router.push(`/quiz/${conceptId}`)}
+            onClick={() => router(`/quiz/${conceptId}`)}
           >
             Take Quiz <ArrowRight className="w-4 h-4" />
           </Button>
@@ -125,7 +123,7 @@ export default function LearnPage() {
 
         {/* CTA */}
         <div className="text-center pt-4">
-          <Button size="lg" className="gap-2" onClick={() => router.push(`/quiz/${conceptId}`)}>
+          <Button size="lg" className="gap-2" onClick={() => router(`/quiz/${conceptId}`)}>
             Test Your Knowledge <ArrowRight className="w-5 h-5" />
           </Button>
         </div>

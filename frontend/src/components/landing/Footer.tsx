@@ -1,5 +1,5 @@
-import Link from "next/link";
-import Image from "next/image";
+import { Link } from 'react-router-dom';
+
 import { Code, Share2, MessageCircle } from "lucide-react";
 
 export function Footer() {
@@ -9,7 +9,7 @@ export function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
           <div className="col-span-1 md:col-span-2">
             <div className="flex items-center gap-2 mb-4">
-              <Image src="/logo.png" alt="Focusly Logo" width={32} height={32} className="rounded-lg object-contain" />
+              <img src="/logo.png" alt="Focusly Logo" width={32} height={32} className="rounded-lg object-contain" />
               <h3 className="text-xl font-bold text-foreground">Focusly</h3>
             </div>
             <p className="max-w-xs mb-6 text-sm leading-relaxed">
@@ -25,10 +25,10 @@ export function Footer() {
           <div>
             <h4 className="text-foreground font-semibold mb-4">Product</h4>
             <ul className="space-y-2 text-sm">
-              <li><Link href="#features" className="hover:text-primary transition-colors">Features</Link></li>
-              <li><Link href="#how-it-works" className="hover:text-primary transition-colors">How it works</Link></li>
-              <li><Link href="#faq" className="hover:text-primary transition-colors">FAQ</Link></li>
-              <li><Link href="/register" className="hover:text-primary transition-colors">Sign up</Link></li>
+              <li><Link to="#features" className="hover:text-primary transition-colors">Features</Link></li>
+              <li><Link to="#how-it-works" className="hover:text-primary transition-colors">How it works</Link></li>
+              <li><Link to="#faq" className="hover:text-primary transition-colors">FAQ</Link></li>
+              <li><Link to="/register" className="hover:text-primary transition-colors">Sign up</Link></li>
             </ul>
           </div>
 

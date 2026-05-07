@@ -1,5 +1,3 @@
-"use client";
-
 import { AppLayout } from "@/components/layout/AppLayout";
 import { MoodSelector } from "@/components/dashboard/MoodSelector";
 import { ForgettingForecastCard } from "@/components/dashboard/ForgettingForecastCard";
@@ -16,12 +14,12 @@ import { CircularProgressSection } from "@/components/dashboard/CircularProgress
 import { CalendarSection } from "@/components/dashboard/CalendarSection";
 import { DailyMissionCard } from "@/components/dashboard/DailyMissionCard";
 
-import { useRouter } from "next/navigation";
+import { useNavigate } from 'react-router-dom';
 import { Trophy, Target, Zap, Rocket, Brain, Flame, Star, Search } from "lucide-react";
 import { toast } from "sonner";
 
 export default function DashboardPage() {
-  const router = useRouter();
+  const router = useNavigate();
 
   const handleStartChallenge = () => {
     toast.success("Analyzing your Smart Notes...", {
@@ -29,7 +27,7 @@ export default function DashboardPage() {
       duration: 3000,
     });
     setTimeout(() => {
-      router.push("/quiz/daily-challenge");
+      router("/quiz/daily-challenge");
     }, 1500);
   };
 

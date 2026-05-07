@@ -16,7 +16,8 @@ public class CorsConfig {
 
                 registry.addMapping("/**")
                         .allowedOrigins(
-                                "https://focusly-ecru.vercel.app")
+                                "https://focusly-ecru.vercel.app",
+                                "http://localhost:5173")
                         .allowedMethods("*")
                         .allowedHeaders("*")
                         .allowCredentials(true);

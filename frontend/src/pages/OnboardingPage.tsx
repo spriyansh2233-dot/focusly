@@ -1,7 +1,5 @@
-"use client";
-
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useNavigate } from 'react-router-dom';
 import { AppLayout } from "@/components/layout/AppLayout";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -13,7 +11,7 @@ export default function OnboardingPage() {
   const [step, setStep] = useState(1);
   const [goal, setGoal] = useState("");
   const [loading, setLoading] = useState(false);
-  const router = useRouter();
+  const router = useNavigate();
 
   const handleNext = () => setStep(step + 1);
 
@@ -25,7 +23,7 @@ export default function OnboardingPage() {
         body: JSON.stringify({ goal: goal || "Learn Web Development" }),
       });
       toast.success("Learning path generated successfully!");
-      router.push("/dashboard");
+      router("/dashboard");
     } catch (error: any) {
       toast.error(error.message || "Failed to generate path");
     } finally {
