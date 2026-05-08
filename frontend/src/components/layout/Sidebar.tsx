@@ -7,6 +7,7 @@ const NAV_ITEMS = [
   { href: "/dashboard", label: "Dashboard", icon: "LayoutDashboard" },
   { href: "/learn/react-hooks", label: "Learn", icon: "BookOpen" },
   { href: "/quiz/react-hooks", label: "Take Quiz", icon: "Pencil" },
+  { href: "/quiz/flashcards", label: "Flashcards", icon: "Layers" },
   { href: "/insights", label: "Insights", icon: "BarChart2" },
   { href: "/resources", label: "Resources", icon: "Library" },
   { href: "/notes", label: "Smart Notes", icon: "FileText" },

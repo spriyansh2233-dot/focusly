@@ -3,8 +3,10 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Target, Zap, ArrowRight, Trophy } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 export function DailyMissionCard() {
+  const router = useNavigate();
   // Mock data - ready for API integration
   const mission = {
     title: "Revise 10 Flashcards",
@@ -67,6 +69,7 @@ export function DailyMissionCard() {
           </div>
           
           <Button 
+            onClick={() => router("/quiz/daily-mission")}
             className="w-full mt-6 rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground font-bold shadow-lg shadow-primary/20 group/btn"
           >
             Start Now 

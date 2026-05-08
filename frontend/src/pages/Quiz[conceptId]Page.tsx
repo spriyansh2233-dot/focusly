@@ -50,6 +50,22 @@ const MOCK_QUESTIONS: Record<string, any[]> = {
       correctAnswer: "@EnableMethodSecurity",
     },
   ],
+  "flashcards": [
+    {
+      id: "f1",
+      questionText: "Flashcard: What is JSX in React?",
+      questionType: "MULTIPLE_CHOICE",
+      options: ["JavaScript XML", "Java Syntax Extension", "JSON Serialization X", "Just Simple XML"],
+      correctAnswer: "JavaScript XML",
+    },
+    {
+      id: "f2",
+      questionText: "Flashcard: What is the virtual DOM?",
+      questionType: "MULTIPLE_CHOICE",
+      options: ["A copy of the real DOM", "A physical hardware DOM", "A remote server DOM", "A direct browser API"],
+      correctAnswer: "A copy of the real DOM",
+    },
+  ],
 };
 
 type QuizState = "loading" | "answering" | "feedback" | "finished";

@@ -21,7 +21,11 @@ public class PathController {
         if (user == null) {
             return ResponseEntity.status(401).build();
         }
-        return ResponseEntity.ok(pathService.getUserPaths(user.getId()));
+        try {
+            return ResponseEntity.ok(pathService.getUserPaths(user.getId()));
+        } catch (Exception e) {
+            return ResponseEntity.ok(java.util.List.of()); // Fallback to empty list
+        }
     }
 
     @PostMapping("/generate")
@@ -29,6 +33,12 @@ public class PathController {
         if (user == null) {
             return ResponseEntity.status(401).build();
         }
-        return ResponseEntity.ok(pathService.generatePath(user, payload.get("goal")));
+        try {
+            return ResponseEntity.ok(pathService.generatePath(user, payload.get("goal")));
+        } catch (Exception e) {
+            java.util.Map<String, Object> error = new java.util.HashMap<>();
+            error.put("error", "Failed to generate path: " + e.getMessage());
+            return ResponseEntity.status(500).body(error);
+        }
     }
 }
