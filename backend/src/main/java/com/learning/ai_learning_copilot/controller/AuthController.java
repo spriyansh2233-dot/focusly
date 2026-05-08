@@ -61,4 +61,22 @@ public class AuthController {
         
         return ResponseEntity.ok(response);
     }
+
+    @PostMapping("/test-token")
+    public ResponseEntity<?> testToken(@RequestBody Map<String, String> payload) {
+        String token = payload.get("token");
+        try {
+            boolean valid = tokenProvider.validateToken(token);
+            String email = null;
+            if (valid) {
+                email = tokenProvider.getEmailFromToken(token);
+            }
+            return ResponseEntity.ok(Map.of(
+                "valid", valid,
+                "email", email == null ? "null" : email
+            ));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        }
+    }
 }

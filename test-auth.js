@@ -29,7 +29,10 @@ async function run() {
 
   console.log("Fetching /api/profile/dna...");
   const dnaRes = await fetch("https://focusly-osxv.onrender.com/api/profile/dna", {
-    headers: { "Authorization": `Bearer ${token}` }
+    headers: { 
+      "Authorization": `Bearer ${token}`,
+      "Origin": "https://focusly-ecru.vercel.app"
+    }
   });
   console.log("DNA status:", dnaRes.status);
   console.log("DNA body:", await dnaRes.text());
