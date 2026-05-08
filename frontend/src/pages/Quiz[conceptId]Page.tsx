@@ -24,7 +24,7 @@ const MOCK_QUESTIONS: Record<string, any[]> = {
       questionText: "What does the useEffect hook replace in class components?",
       questionType: "MULTIPLE_CHOICE",
       options: ["render()", "constructor()", "componentDidMount / componentDidUpdate / componentWillUnmount", "setState()"],
-      correctAnswer: "componentDidMount / componentDidUpdate / componentWillUnmount",
+      correctAnswer: "componentDidMount / componentDidUpdate / componentDidUpdate / componentWillUnmount",
     },
     {
       id: "q3",
@@ -32,6 +32,15 @@ const MOCK_QUESTIONS: Record<string, any[]> = {
       questionType: "MULTIPLE_CHOICE",
       options: ["useState", "useCallback", "useRef", "useMemo"],
       correctAnswer: "useRef",
+    },
+  ],
+  "spring-boot": [
+    {
+      id: "s1",
+      questionText: "What is Spring Boot?",
+      questionType: "MULTIPLE_CHOICE",
+      options: ["A JS framework", "An opinionated framework for Spring", "A database engine", "A styling tool"],
+      correctAnswer: "An opinionated framework for Spring",
     },
   ],
   "spring-security": [
