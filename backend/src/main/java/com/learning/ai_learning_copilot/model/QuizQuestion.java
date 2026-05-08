@@ -7,6 +7,8 @@ import java.util.UUID;
 import java.time.LocalDateTime;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 @Entity
 @Table(name = "quiz_questions")
@@ -29,6 +31,7 @@ public class QuizQuestion {
     @Column(name = "question_type")
     private String questionType;
 
+    @JdbcTypeCode(SqlTypes.JSON)
     @Column(columnDefinition = "json")
     private String options;
 

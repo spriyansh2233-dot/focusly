@@ -7,6 +7,8 @@ import java.util.UUID;
 import java.time.LocalDateTime;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 @Entity
 @Table(name = "learning_profile")
@@ -32,9 +34,11 @@ public class LearningProfile {
     @Column(name = "avg_focus_minutes")
     private Integer avgFocusMinutes = 25;
 
+    @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "weak_topics", columnDefinition = "json")
     private String weakTopics;
 
+    @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "strongest_topics", columnDefinition = "json")
     private String strongestTopics;
 
