@@ -68,12 +68,16 @@ public class AuthController {
         try {
             boolean valid = tokenProvider.validateToken(token);
             String email = null;
+            boolean userFound = false;
             if (valid) {
                 email = tokenProvider.getEmailFromToken(token);
+                Optional<User> u = userService.findByEmail(email);
+                userFound = u.isPresent();
             }
             return ResponseEntity.ok(Map.of(
                 "valid", valid,
-                "email", email == null ? "null" : email
+                "email", email == null ? "null" : email,
+                "userFound", userFound
             ));
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
