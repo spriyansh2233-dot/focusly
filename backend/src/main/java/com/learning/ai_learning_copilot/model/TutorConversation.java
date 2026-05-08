@@ -30,6 +30,7 @@ public class TutorConversation {
     @JoinColumn(name = "concept_id")
     private Concept concept;
 
+    @JdbcTypeCode(SqlTypes.JSON)
     @Column(columnDefinition = "json", nullable = false)
     private String messages;
 

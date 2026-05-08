@@ -30,6 +30,7 @@ public class LearningPath {
     @Column(name = "goal_description")
     private String goalDescription;
 
+    @JdbcTypeCode(SqlTypes.JSON)
     @Column(columnDefinition = "json", nullable = false)
     private String pathway;
 
