@@ -28,7 +28,7 @@ public class NoteService {
     private FileParserService fileParserService;
 
     @Autowired
-    private AITutorService aiTutorService;
+    private GeminiService geminiService;
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
@@ -89,7 +89,7 @@ public class NoteService {
         }
 
         String prompt = "You are an AI study assistant. Read the following text and provide a summary, bullet points for revision, and key concepts. " +
-                "Respond ONLY with a valid JSON object matching exactly this structure (no markdown formatting, no code blocks, just raw JSON):\n" +
+                "Respond ONLY with a valid JSON object matching exactly this structure:\n" +
                 "{\n" +
                 "  \"summary\": \"A short 2-3 sentence summary.\",\n" +
                 "  \"bullet_points\": \"- Point 1\\n- Point 2\",\n" +
@@ -97,7 +97,7 @@ public class NoteService {
                 "}\n\n" +
                 "Text to summarize: \n" + note.getContent();
 
-        String aiResponse = aiTutorService.generateResponse(prompt);
+        String aiResponse = geminiService.generateContent(prompt);
 
         try {
             // Clean up potentially wrapped JSON response just in case the AI wraps it in ```json

@@ -6,76 +6,9 @@ import { Button } from "@/components/ui/button";
 import { H1, H2, H3, Body } from "@/components/ui/typography";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { CheckCircle, XCircle, Clock, ArrowRight, Trophy } from "lucide-react";
+import { CheckCircle, XCircle, Clock, ArrowRight, Trophy, Loader2 } from "lucide-react";
 import { submitQuiz } from "@/lib/api";
 import { toast } from "sonner";
-
-const MOCK_QUESTIONS: Record<string, any[]> = {
-  "react-hooks": [
-    {
-      id: "q1",
-      questionText: "Which React Hook is used to manage component state?",
-      questionType: "MULTIPLE_CHOICE",
-      options: ["useEffect", "useState", "useRef", "useContext"],
-      correctAnswer: "useState",
-    },
-    {
-      id: "q2",
-      questionText: "What does the useEffect hook replace in class components?",
-      questionType: "MULTIPLE_CHOICE",
-      options: ["render()", "constructor()", "componentDidMount / componentDidUpdate / componentWillUnmount", "setState()"],
-      correctAnswer: "componentDidMount / componentDidUpdate / componentDidUpdate / componentWillUnmount",
-    },
-    {
-      id: "q3",
-      questionText: "Which hook would you use to access a DOM element directly?",
-      questionType: "MULTIPLE_CHOICE",
-      options: ["useState", "useCallback", "useRef", "useMemo"],
-      correctAnswer: "useRef",
-    },
-  ],
-  "spring-boot": [
-    {
-      id: "s1",
-      questionText: "What is Spring Boot?",
-      questionType: "MULTIPLE_CHOICE",
-      options: ["A JS framework", "An opinionated framework for Spring", "A database engine", "A styling tool"],
-      correctAnswer: "An opinionated framework for Spring",
-    },
-  ],
-  "spring-security": [
-    {
-      id: "q1",
-      questionText: "What is the primary purpose of Spring Security?",
-      questionType: "MULTIPLE_CHOICE",
-      options: ["Database management", "Authentication and Authorization", "HTTP caching", "Dependency injection"],
-      correctAnswer: "Authentication and Authorization",
-    },
-    {
-      id: "q2",
-      questionText: "Which annotation enables method-level security in Spring?",
-      questionType: "MULTIPLE_CHOICE",
-      options: ["@EnableWebSecurity", "@PreAuthorize", "@Secured", "@EnableMethodSecurity"],
-      correctAnswer: "@EnableMethodSecurity",
-    },
-  ],
-  "flashcards": [
-    {
-      id: "f1",
-      questionText: "Flashcard: What is JSX in React?",
-      questionType: "MULTIPLE_CHOICE",
-      options: ["JavaScript XML", "Java Syntax Extension", "JSON Serialization X", "Just Simple XML"],
-      correctAnswer: "JavaScript XML",
-    },
-    {
-      id: "f2",
-      questionText: "Flashcard: What is the virtual DOM?",
-      questionType: "MULTIPLE_CHOICE",
-      options: ["A copy of the real DOM", "A physical hardware DOM", "A remote server DOM", "A direct browser API"],
-      correctAnswer: "A copy of the real DOM",
-    },
-  ],
-};
 
 type QuizState = "loading" | "answering" | "feedback" | "finished";
 
@@ -83,20 +16,48 @@ export default function QuizPage() {
   const { conceptId } = useParams<{ conceptId: string }>();
   const router = useNavigate();
 
-  const questions = MOCK_QUESTIONS[conceptId as string] ?? MOCK_QUESTIONS["react-hooks"];
-
-  const [state, setState] = useState<QuizState>("answering");
+  const [questions, setQuestions] = useState<any[]>([]);
+  const [state, setState] = useState<QuizState>("loading");
   const [currentIdx, setCurrentIdx] = useState(0);
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
   const [isCorrect, setIsCorrect] = useState<boolean | null>(null);
   const [score, setScore] = useState(0);
   const [startTime, setStartTime] = useState<number>(Date.now());
 
+  useEffect(() => {
+    const fetchQuestions = async () => {
+      try {
+        const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:8080'}/api/quiz/concept/${conceptId}`, {
+          headers: {
+            "Authorization": `Bearer ${localStorage.getItem("token")}`,
+          },
+        });
+        if (!response.ok) throw new Error("Failed to fetch questions");
+        const data = await response.json();
+        setQuestions(data);
+        setState(data.length > 0 ? "answering" : "finished");
+      } catch (error) {
+        toast.error("Failed to load questions");
+        setState("finished");
+      }
+    };
+
+    if (conceptId) fetchQuestions();
+  }, [conceptId]);
+
   const question = questions[currentIdx];
   const isLast = currentIdx === questions.length - 1;
-  const options: string[] = JSON.parse(
-    typeof question.options === "string" ? question.options : JSON.stringify(question.options)
-  );
+  
+  const getOptions = () => {
+    if (!question) return [];
+    try {
+      return typeof question.options === "string" ? JSON.parse(question.options) : question.options;
+    } catch (e) {
+      return [];
+    }
+  };
+
+  const options = getOptions();
 
   const handleSelect = (option: string) => {
     if (state !== "answering") return;
@@ -121,6 +82,18 @@ export default function QuizPage() {
       setState("answering");
     }
   };
+
+  if (state === "loading") {
+    return (
+      <AppLayout>
+        <div className="flex flex-col items-center justify-center min-h-[60vh] gap-4">
+          <Loader2 className="w-12 h-12 text-primary animate-spin" />
+          <H2>Generating AI Quiz...</H2>
+          <Body className="text-muted-foreground text-center">We're crafting challenging questions just for you.</Body>
+        </div>
+      </AppLayout>
+    );
+  }
 
   if (state === "finished") {
     const pct = Math.round((score / questions.length) * 100);

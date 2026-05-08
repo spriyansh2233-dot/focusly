@@ -42,6 +42,43 @@ export default function DashboardPage() {
     }, 1500);
   };
 
+  const handleSearch = async (topic: string) => {
+    if (!topic.trim()) return;
+    setLoading(true);
+    const toastId = toast.loading(`Focusing on ${topic}...`, {
+      description: "AI is generating your personalized roadmap.",
+    });
+    
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:8080'}/api/paths/generate`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${localStorage.getItem("token")}`,
+        },
+        body: JSON.stringify({ goal: topic }),
+      });
+
+      if (!response.ok) throw new Error("Failed to generate path");
+      
+      const path = await response.json();
+      toast.success("Roadmap Ready!", {
+        id: toastId,
+        description: `Successfully generated a path for ${topic}.`,
+      });
+      
+      // Refresh active paths or navigate
+      window.location.reload(); 
+    } catch (error) {
+      toast.error("Generation failed", {
+        id: toastId,
+        description: "Please try again in a moment.",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <AppLayout>
       <div className="max-w-7xl mx-auto space-y-10 pb-20">
@@ -55,6 +92,33 @@ export default function DashboardPage() {
             <Body className="text-muted-foreground text-lg">
               Level up your brain today.
             </Body>
+          </div>
+
+          {/* Dynamic Topic Search Bar */}
+          <div className="flex-1 max-w-xl mx-auto w-full group relative">
+            <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none">
+              <Search className="h-5 w-5 text-muted-foreground group-focus-within:text-primary transition-colors" />
+            </div>
+            <input 
+              type="text"
+              placeholder="What do you want to learn today? (e.g. Machine Learning, Calculus, Java...)"
+              className="w-full h-14 pl-12 pr-32 rounded-2xl bg-background border-2 border-border/50 focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all outline-none font-medium shadow-sm"
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  handleSearch((e.target as HTMLInputElement).value);
+                }
+              }}
+            />
+            <Button 
+              className="absolute right-2 top-2 h-10 rounded-xl px-6 bg-primary font-bold"
+              onClick={() => {
+                const input = document.querySelector('input') as HTMLInputElement;
+                handleSearch(input.value);
+              }}
+              disabled={loading}
+            >
+              {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : "Learn"}
+            </Button>
           </div>
 
           <div className="flex flex-wrap items-center gap-4">

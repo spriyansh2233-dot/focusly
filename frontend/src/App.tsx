@@ -14,6 +14,7 @@ import NoteDetailPage from './pages/Notes[id]Page';
 import OnboardingPage from './pages/OnboardingPage';
 import HomePage from './pages/HomePage';
 import QuizConceptPage from './pages/Quiz[conceptId]Page';
+import FlashcardPage from './pages/FlashcardPage';
 import RegisterPage from './pages/RegisterPage';
 import ResourcesPage from './pages/ResourcesPage';
 
@@ -44,6 +45,8 @@ function App() {
           <Route path="/notes/:id" element={<ProtectedRoute><NoteDetailPage /></ProtectedRoute>} />
           <Route path="/onboarding" element={<ProtectedRoute><OnboardingPage /></ProtectedRoute>} />
           <Route path="/quiz/:conceptId" element={<ProtectedRoute><QuizConceptPage /></ProtectedRoute>} />
+          <Route path="/flashcards" element={<ProtectedRoute><FlashcardPage /></ProtectedRoute>} />
+          <Route path="/flashcards/:conceptId" element={<ProtectedRoute><FlashcardPage /></ProtectedRoute>} />
           <Route path="/resources" element={<ProtectedRoute><ResourcesPage /></ProtectedRoute>} />
         </Route>
       </Routes>

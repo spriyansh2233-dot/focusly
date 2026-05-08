@@ -23,8 +23,45 @@ public class QuizService {
     @Autowired
     private SpacedRepetitionService spacedRepetitionService;
 
+    @Autowired
+    private GeminiService geminiService;
+
+    @Autowired
+    private com.learning.ai_learning_copilot.repository.ConceptRepository conceptRepository;
+
     public List<QuizQuestion> getQuestionsForConcept(UUID conceptId) {
-        return questionRepository.findByConceptId(conceptId);
+        List<QuizQuestion> existing = questionRepository.findByConceptId(conceptId);
+        if (existing.isEmpty()) {
+            return generateAIQuestions(conceptId);
+        }
+        return existing;
+    }
+
+    public List<QuizQuestion> generateAIQuestions(UUID conceptId) {
+        var concept = conceptRepository.findById(conceptId)
+                .orElseThrow(() -> new RuntimeException("Concept not found"));
+
+        String prompt = String.format(
+            "Generate 5 multiple-choice questions for the concept: '%s' in the context of '%s'. " +
+            "Return ONLY a JSON array. Each object should have: " +
+            "'questionText' (string), 'options' (array of strings), 'correctAnswer' (string). " +
+            "Ensure questions are challenging and test deep understanding.",
+            concept.getTitle(), concept.getLearningPath().getGoalDescription()
+        );
+
+        List<Map<String, Object>> aiQuestions = geminiService.generateJSONContent(prompt);
+        
+        return aiQuestions.stream().map(data -> {
+            QuizQuestion q = new QuizQuestion();
+            q.setConcept(concept);
+            q.setQuestionText((String) data.get("questionText"));
+            try {
+                q.setOptions(new com.fasterxml.jackson.databind.ObjectMapper().writeValueAsString(data.get("options")));
+            } catch (Exception e) {}
+            q.setCorrectAnswer((String) data.get("correctAnswer"));
+            q.setQuestionType("MULTIPLE_CHOICE");
+            return questionRepository.save(q);
+        }).toList();
     }
 
     public QuizAttempt submitAnswer(User user, UUID questionId, String answer, int timeSpent) {

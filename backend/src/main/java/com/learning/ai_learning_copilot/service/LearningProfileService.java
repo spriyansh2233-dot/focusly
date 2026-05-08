@@ -15,6 +15,12 @@ public class LearningProfileService {
     @Autowired
     private LearningProfileRepository repository;
 
+    @Autowired
+    private com.learning.ai_learning_copilot.repository.QuizAttemptRepository quizAttemptRepository;
+
+    @Autowired
+    private com.learning.ai_learning_copilot.repository.StudySessionRepository studySessionRepository;
+
     public LearningProfile getProfile(UUID userId) {
         return repository.findByUserId(userId).orElse(null);
     }
@@ -24,26 +30,32 @@ public class LearningProfileService {
             .orElseGet(() -> {
                 LearningProfile newProfile = new LearningProfile();
                 newProfile.setUser(user);
-                newProfile.setPreferredStyle(user.getLearningStyle() != null ? user.getLearningStyle().name() : "VISUAL");
-                newProfile.setBestStudyTime("EVENING");
-                newProfile.setAvgFocusMinutes(50); // Focus score 50
+                newProfile.setPreferredStyle("VISUAL");
                 newProfile.setWeakTopics("[]");
                 newProfile.setStrongestTopics("[]");
-                newProfile.setQuizAccuracy(0.0);
-                newProfile.setConsistencyScore(0);
                 return newProfile;
             });
 
-        // Initial setup for consistency if it's the first time
-        if (profile.getUpdatedAt() == null) {
-            profile.setQuizAccuracy(0.0);
-            profile.setConsistencyScore(0);
-        } else {
-            // Recalculation logic for subsequent updates
-            profile.setQuizAccuracy(Math.min(100.0, profile.getQuizAccuracy() + 1.0));
-            profile.setConsistencyScore(Math.min(100, profile.getConsistencyScore() + 2));
+        // Calculate Quiz Accuracy
+        var attempts = quizAttemptRepository.findByUserId(user.getId());
+        if (!attempts.isEmpty()) {
+            long correctCount = attempts.stream().filter(com.learning.ai_learning_copilot.model.QuizAttempt::getIsCorrect).count();
+            profile.setQuizAccuracy((double) correctCount / attempts.size() * 100);
         }
-        
+
+        // Calculate Consistency Score
+        var sessions = studySessionRepository.findByUserId(user.getId());
+        profile.setConsistencyScore(Math.min(100, sessions.size() * 5));
+
+        // Calculate Focus Span
+        if (!sessions.isEmpty()) {
+            double avgTime = sessions.stream()
+                .mapToInt(com.learning.ai_learning_copilot.model.StudySession::getDurationMinutes)
+                .average()
+                .orElse(25.0);
+            profile.setAvgFocusMinutes((int) avgTime);
+        }
+
         profile.setUpdatedAt(LocalDateTime.now());
         return repository.save(profile);
     }

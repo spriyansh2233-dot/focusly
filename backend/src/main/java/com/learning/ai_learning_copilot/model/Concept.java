@@ -24,6 +24,11 @@ public class Concept {
     @Column(nullable = false)
     private String subject;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "learning_path_id", nullable = false)
+    @com.fasterxml.jackson.annotation.JsonIgnore
+    private LearningPath learningPath;
+
     private String description;
     
     @Column(name = "difficulty_level")

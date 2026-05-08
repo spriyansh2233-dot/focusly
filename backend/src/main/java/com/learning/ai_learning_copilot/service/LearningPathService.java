@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @Service
@@ -15,6 +16,15 @@ public class LearningPathService {
 
     @Autowired
     private LearningPathRepository repository;
+
+    @Autowired
+    private GeminiService geminiService;
+
+    @Autowired
+    private com.learning.ai_learning_copilot.repository.ConceptRepository conceptRepository;
+
+    @Autowired
+    private com.fasterxml.jackson.databind.ObjectMapper objectMapper;
 
     public List<LearningPath> getUserPaths(UUID userId) {
         return repository.findByUserId(userId);
@@ -25,13 +35,38 @@ public class LearningPathService {
         path.setUser(user);
         path.setGoalDescription(goal);
         path.setCurrentWeek(1);
-        path.setTargetCompletionDate(LocalDate.now().plusWeeks(4));
+        path.setTargetCompletionDate(LocalDate.now().plusWeeks(6));
         
-        // Dummy pathway JSON
-        String dummyPathway = "[{\"week\": 1, \"topics\": [\"Introduction\", \"Basic Syntax\"]}, " +
-                              "{\"week\": 2, \"topics\": [\"Core Concepts\", \"Advanced Features\"]}]";
-        path.setPathway(dummyPathway);
+        String prompt = String.format(
+            "Generate a detailed 6-week learning roadmap for the topic: '%s'. " +
+            "Return ONLY a JSON array where each object has 'week' (int), 'title' (string), and 'topics' (array of strings).",
+            goal
+        );
         
-        return repository.save(path);
+        String aiPathway = geminiService.generateContent(prompt);
+        String cleanJson = aiPathway.replaceAll("```json", "").replaceAll("```", "").trim();
+        path.setPathway(cleanJson);
+        
+        LearningPath savedPath = repository.save(path);
+
+        // Auto-create Concepts from the first few topics
+        try {
+            List<Map<String, Object>> roadmap = objectMapper.readValue(cleanJson, List.class);
+            for (Map<String, Object> week : roadmap) {
+                List<String> topics = (List<String>) week.get("topics");
+                for (String topicName : topics) {
+                    com.learning.ai_learning_copilot.model.Concept concept = new com.learning.ai_learning_copilot.model.Concept();
+                    concept.setName(topicName);
+                    concept.setLearningPath(savedPath);
+                    concept.setSubject(goal);
+                    concept.setDifficultyLevel(0.5);
+                    conceptRepository.save(concept);
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("Failed to auto-create concepts: " + e.getMessage());
+        }
+        
+        return savedPath;
     }
 }
