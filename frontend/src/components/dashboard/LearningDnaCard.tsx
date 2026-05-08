@@ -42,11 +42,20 @@ export function LearningDnaCard() {
     );
   }
   
-  if (!profile) {
+  if (!profile || (profile.consistencyScore === 0 && (!profile.strengths || profile.strengths.length === 0))) {
     return (
-      <Card className="elevated border-border/50 flex flex-col items-center justify-center p-10 text-center opacity-50">
-        <Icon name="Dna" className="w-8 h-8 mb-2" />
-        <p className="text-xs font-bold uppercase tracking-wider">Learning DNA Unavailable</p>
+      <Card className="elevated border-border/50 h-full flex flex-col items-center justify-center p-8 text-center">
+        <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center text-primary mb-4 animate-pulse">
+          <Icon name="Dna" className="w-8 h-8" />
+        </div>
+        <CardTitle className="text-lg mb-2">Analyzing your DNA...</CardTitle>
+        <p className="text-sm text-muted-foreground mb-6 max-w-[250px]">
+          Start learning and taking quizzes to unlock your personalized learning profile.
+        </p>
+        <div className="w-full space-y-3 opacity-30 pointer-events-none">
+          <div className="h-2 bg-muted rounded w-full" />
+          <div className="h-2 bg-muted rounded w-2/3" />
+        </div>
       </Card>
     );
   }

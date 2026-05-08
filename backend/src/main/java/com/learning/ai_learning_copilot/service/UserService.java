@@ -16,6 +16,9 @@ public class UserService {
     private UserRepository userRepository;
 
     @Autowired
+    private LearningProfileService learningProfileService;
+
+    @Autowired
     private PasswordEncoder passwordEncoder;
 
     public User registerUser(String username, String email, String password) {
@@ -29,7 +32,12 @@ public class UserService {
         user.setPasswordHash(passwordEncoder.encode(password));
         user.setLearningStyle(LearningStyle.VISUAL);
         
-        return userRepository.save(user);
+        User savedUser = userRepository.save(user);
+        
+        // Seed Learning Profile
+        learningProfileService.recalculateProfile(savedUser);
+        
+        return savedUser;
     }
 
     public Optional<User> findByEmail(String email) {

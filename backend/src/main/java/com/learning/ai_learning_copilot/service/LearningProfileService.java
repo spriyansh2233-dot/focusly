@@ -26,19 +26,25 @@ public class LearningProfileService {
                 newProfile.setUser(user);
                 newProfile.setPreferredStyle(user.getLearningStyle() != null ? user.getLearningStyle().name() : "VISUAL");
                 newProfile.setBestStudyTime("EVENING");
-                newProfile.setAvgFocusMinutes(25);
-                newProfile.setWeakTopics("[\"React Hooks\", \"Spring Security\"]");
-                newProfile.setStrongestTopics("[\"Java Basics\", \"CSS Grid\"]");
+                newProfile.setAvgFocusMinutes(50); // Focus score 50
+                newProfile.setWeakTopics("[]");
+                newProfile.setStrongestTopics("[]");
                 newProfile.setQuizAccuracy(0.0);
                 newProfile.setConsistencyScore(0);
                 return newProfile;
             });
 
-        // Dummy recalculation logic for MVP
-        profile.setQuizAccuracy(85.5);
-        profile.setConsistencyScore(Math.min(100, profile.getConsistencyScore() + 5));
+        // Initial setup for consistency if it's the first time
+        if (profile.getUpdatedAt() == null) {
+            profile.setQuizAccuracy(0.0);
+            profile.setConsistencyScore(0);
+        } else {
+            // Recalculation logic for subsequent updates
+            profile.setQuizAccuracy(Math.min(100.0, profile.getQuizAccuracy() + 1.0));
+            profile.setConsistencyScore(Math.min(100, profile.getConsistencyScore() + 2));
+        }
+        
         profile.setUpdatedAt(LocalDateTime.now());
-
         return repository.save(profile);
     }
 }

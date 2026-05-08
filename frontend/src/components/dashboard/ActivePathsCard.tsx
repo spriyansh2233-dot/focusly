@@ -24,9 +24,15 @@ export function ActivePathsCard() {
       </CardHeader>
       <CardContent className="p-4 flex-1">
         {paths.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-10 opacity-50">
-            <BookOpen className="w-8 h-8 mb-2" />
-            <p className="text-xs font-bold uppercase tracking-wider">No active paths</p>
+          <div className="flex flex-col items-center justify-center py-6 text-center">
+            <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-primary mb-4">
+              <BookOpen className="w-6 h-6" />
+            </div>
+            <p className="text-sm font-bold mb-1">No Active Paths</p>
+            <p className="text-xs text-muted-foreground mb-4 max-w-[180px]">Start your journey by defining your first learning goal.</p>
+            <Button size="sm" className="rounded-full font-bold px-6" onClick={() => router("/onboarding")}>
+              Create Path
+            </Button>
           </div>
         ) : (
           <div className="space-y-4">

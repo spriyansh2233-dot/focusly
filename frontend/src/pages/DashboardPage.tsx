@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { MoodSelector } from "@/components/dashboard/MoodSelector";
 import { ForgettingForecastCard } from "@/components/dashboard/ForgettingForecastCard";
@@ -15,11 +16,21 @@ import { CalendarSection } from "@/components/dashboard/CalendarSection";
 import { DailyMissionCard } from "@/components/dashboard/DailyMissionCard";
 
 import { useNavigate } from 'react-router-dom';
-import { Trophy, Target, Zap, Rocket, Brain, Flame, Star, Search } from "lucide-react";
+import { Trophy, Target, Zap, Rocket, Brain, Flame, Star, Search, Loader2 } from "lucide-react";
 import { toast } from "sonner";
+import { getLearningDna } from "@/lib/api";
 
 export default function DashboardPage() {
   const router = useNavigate();
+  const [profile, setProfile] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    getLearningDna()
+      .then(setProfile)
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  }, []);
 
   const handleStartChallenge = () => {
     toast.success("Analyzing your Smart Notes...", {
@@ -54,7 +65,7 @@ export default function DashboardPage() {
               </div>
               <div>
                 <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest leading-none mb-1">STREAK</p>
-                <p className="text-xl font-black leading-none">14 Days</p>
+                <p className="text-xl font-black leading-none">{profile?.currentStreak || 0} Days</p>
               </div>
             </Card>
 
@@ -78,7 +89,9 @@ export default function DashboardPage() {
               </div>
               <div>
                 <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest leading-none mb-1">LEVEL</p>
-                <p className="text-xl font-black leading-none">Elite 4</p>
+                <p className="text-xl font-black leading-none">
+                  {profile ? `Level ${Math.floor((profile.consistencyScore || 0) * 10) + 1}` : "..."}
+                </p>
               </div>
             </Card>
           </div>
