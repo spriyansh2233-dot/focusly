@@ -34,7 +34,13 @@ async function run() {
       "Origin": "https://focusly-ecru.vercel.app"
     }
   });
-  console.log("DNA status:", dnaRes.status);
-  console.log("DNA body:", await dnaRes.text());
+  console.log("Testing token endpoint...");
+  const testRes = await fetch("https://focusly-osxv.onrender.com/api/auth/test-token", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ token })
+  });
+  console.log("Test token status:", testRes.status);
+  console.log("Test token body:", await testRes.text());
 }
 run();
