@@ -15,7 +15,7 @@ Focusly is a premium full-stack study companion optimized for smart students. It
 
 | Layer | Technology |
 | :--- | :--- |
-| **Frontend** | Next.js 16 (App Router) + Tailwind CSS 4 + Framer Motion |
+| **Frontend** | react + Tailwind CSS 4 + Framer Motion |
 | **Backend** | Java 21 + Spring Boot 3.4 + Spring Security |
 | **Database** | PostgreSQL + H2 (Local Development) |
 | **AI Engine** | Google Gemini 1.5 Flash + Structured Prompting |
