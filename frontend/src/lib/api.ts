@@ -91,6 +91,14 @@ export async function getPaths() {
   return fetchWithAuth("/paths");
 }
 
+export async function getPathDetails(id: string) {
+  return fetchWithAuth(`/paths/${id}`);
+}
+
+export async function getPathConcepts(id: string) {
+  return fetchWithAuth(`/paths/${id}/concepts`);
+}
+
 export async function getQuiz(conceptId: string) {
   return fetchWithAuth(`/quiz/concept/${conceptId}`);
 }
@@ -170,4 +178,16 @@ export async function uploadNote(file: File) {
     throw new Error("Failed to upload note");
   }
   return response.json();
+}
+
+export async function getFlashcards(conceptId?: string) {
+  const url = conceptId ? `/flashcards?conceptId=${conceptId}` : `/flashcards`;
+  return fetchWithAuth(url);
+}
+
+export async function updateFlashcardConfidence(id: string, level: number) {
+  return fetchWithAuth(`/flashcards/${id}/confidence`, {
+    method: "PUT",
+    body: JSON.stringify({ level }),
+  });
 }

@@ -8,6 +8,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/paths")
@@ -25,6 +26,30 @@ public class PathController {
             return ResponseEntity.ok(pathService.getUserPaths(user.getId()));
         } catch (Exception e) {
             return ResponseEntity.ok(java.util.List.of()); // Fallback to empty list
+        }
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<?> getPath(@AuthenticationPrincipal User user, @PathVariable UUID id) {
+        if (user == null) {
+            return ResponseEntity.status(401).build();
+        }
+        try {
+            return ResponseEntity.ok(pathService.getPath(id));
+        } catch (Exception e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @GetMapping("/{id}/concepts")
+    public ResponseEntity<?> getPathConcepts(@AuthenticationPrincipal User user, @PathVariable UUID id) {
+        if (user == null) {
+            return ResponseEntity.status(401).build();
+        }
+        try {
+            return ResponseEntity.ok(pathService.getPathConcepts(id));
+        } catch (Exception e) {
+            return ResponseEntity.ok(java.util.List.of());
         }
     }
 

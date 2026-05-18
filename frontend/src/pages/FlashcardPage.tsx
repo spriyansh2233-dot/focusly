@@ -7,6 +7,7 @@ import { H1, H2, Body } from "@/components/ui/typography";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronLeft, ChevronRight, RotateCcw, ThumbsUp, ThumbsDown, Loader2, Brain } from "lucide-react";
 import { toast } from "sonner";
+import { getFlashcards, updateFlashcardConfidence } from "@/lib/api";
 
 export default function FlashcardPage() {
   const { conceptId } = useParams<{ conceptId: string }>();
@@ -17,28 +18,20 @@ export default function FlashcardPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    let mounted = true;
     const fetchCards = async () => {
       try {
-        const url = conceptId 
-          ? `${import.meta.env.VITE_API_URL || 'http://localhost:8080'}/api/flashcards?conceptId=${conceptId}`
-          : `${import.meta.env.VITE_API_URL || 'http://localhost:8080'}/api/flashcards`;
-          
-        const response = await fetch(url, {
-          headers: {
-            "Authorization": `Bearer ${localStorage.getItem("token")}`,
-          },
-        });
-        if (!response.ok) throw new Error("Failed to fetch cards");
-        const data = await response.json();
-        setCards(data);
+        const data = await getFlashcards(conceptId);
+        if (mounted) setCards(data);
       } catch (error) {
-        toast.error("Failed to load flashcards");
+        if (mounted) toast.error("Failed to load flashcards");
       } finally {
-        setLoading(false);
+        if (mounted) setLoading(false);
       }
     };
 
     fetchCards();
+    return () => { mounted = false; };
   }, [conceptId]);
 
   const handleNext = () => {
@@ -58,14 +51,7 @@ export default function FlashcardPage() {
   const handleConfidence = async (level: number) => {
     const card = cards[currentIdx];
     try {
-      await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:8080'}/api/flashcards/${card.id}/confidence`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${localStorage.getItem("token")}`,
-        },
-        body: JSON.stringify({ level }),
-      });
+      await updateFlashcardConfidence(card.id, level);
       toast.success("Progress saved!");
       handleNext();
     } catch (e) {

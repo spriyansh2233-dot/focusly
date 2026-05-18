@@ -98,19 +98,26 @@ export default function NotesPage() {
           </div>
         </div>
 
-        <Card className="p-2 flex items-center gap-2">
-          <form onSubmit={handleSearch} className="flex-1 flex items-center gap-2">
-            <Search className="w-5 h-5 text-muted-foreground ml-2" />
+        <div className="w-full group relative rounded-2xl border-2 border-border/50 bg-background shadow-sm hover:border-primary/50 hover:shadow-md hover:shadow-primary/5 focus-within:border-primary focus-within:ring-4 focus-within:ring-primary/10 transition-all duration-300">
+          <form onSubmit={handleSearch} className="flex-1 flex items-center relative">
+            <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none text-muted-foreground group-focus-within:text-primary transition-colors duration-300">
+              <Search className="h-5 w-5" />
+            </div>
             <input 
               type="text"
               placeholder="Search your notes..."
-              className="flex-1 bg-transparent border-none outline-none focus:ring-0 text-sm py-2"
+              className="w-full h-12 pl-12 pr-28 rounded-2xl bg-transparent border-none outline-none focus:ring-0 font-medium text-foreground placeholder-muted-foreground/70 transition-all duration-300 text-sm truncate"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
-            <Button type="submit" variant="ghost" size="sm">Search</Button>
+            <Button 
+              type="submit" 
+              className="absolute right-1.5 top-1.5 bottom-1.5 h-9 rounded-xl px-5 bg-primary hover:bg-primary/95 text-primary-foreground font-bold hover:scale-105 active:scale-95 shadow-md shadow-primary/10 transition-all duration-300 flex items-center justify-center"
+            >
+              Search
+            </Button>
           </form>
-        </Card>
+        </div>
 
         {loading ? (
           <div className="flex items-center justify-center py-20">

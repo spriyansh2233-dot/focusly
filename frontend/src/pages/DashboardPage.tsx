@@ -24,6 +24,7 @@ export default function DashboardPage() {
   const router = useNavigate();
   const [profile, setProfile] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [searchTopic, setSearchTopic] = useState("");
 
   useEffect(() => {
     getLearningDna()
@@ -95,27 +96,26 @@ export default function DashboardPage() {
           </div>
 
           {/* Dynamic Topic Search Bar */}
-          <div className="flex-1 max-w-xl mx-auto w-full group relative">
-            <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none">
-              <Search className="h-5 w-5 text-muted-foreground group-focus-within:text-primary transition-colors" />
+          <div className="flex-1 max-w-xl w-full group relative rounded-2xl border-2 border-border/50 bg-background shadow-sm hover:border-primary/50 hover:shadow-md hover:shadow-primary/5 focus-within:border-primary focus-within:ring-4 focus-within:ring-primary/10 transition-all duration-300">
+            <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none text-muted-foreground group-focus-within:text-primary transition-colors duration-300">
+              <Search className="h-5 w-5" />
             </div>
             <input 
               type="text"
-              placeholder="What do you want to learn today? (e.g. Machine Learning, Calculus, Java...)"
-              className="w-full h-14 pl-12 pr-32 rounded-2xl bg-background border-2 border-border/50 focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all outline-none font-medium shadow-sm"
+              placeholder="What do you want to learn today? (e.g. React, ML...)"
+              className="w-full h-14 pl-12 pr-28 rounded-2xl bg-transparent border-none outline-none focus:ring-0 font-medium text-foreground placeholder-muted-foreground/70 transition-all duration-300 text-sm md:text-base truncate"
+              value={searchTopic}
+              onChange={(e) => setSearchTopic(e.target.value)}
               onKeyDown={(e) => {
                 if (e.key === 'Enter') {
-                  handleSearch((e.target as HTMLInputElement).value);
+                  handleSearch(searchTopic);
                 }
               }}
             />
             <Button 
-              className="absolute right-2 top-2 h-10 rounded-xl px-6 bg-primary font-bold"
-              onClick={() => {
-                const input = document.querySelector('input') as HTMLInputElement;
-                handleSearch(input.value);
-              }}
-              disabled={loading}
+              className="absolute right-2 top-2 h-10 rounded-xl px-6 bg-primary hover:bg-primary/95 text-primary-foreground font-bold hover:scale-105 active:scale-95 shadow-md shadow-primary/10 transition-all duration-300 flex items-center justify-center"
+              onClick={() => handleSearch(searchTopic)}
+              disabled={loading || !searchTopic.trim()}
             >
               {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : "Learn"}
             </Button>

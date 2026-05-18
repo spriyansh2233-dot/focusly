@@ -1,33 +1,13 @@
-import { ReactNode, useEffect, useState } from "react";
+import { ReactNode } from "react";
 import { Sidebar } from "./Sidebar";
 import { TopNav } from "./TopNav";
 import { MobileNav } from "./MobileNav";
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
+import { ErrorBoundary } from "../ErrorBoundary";
 
 export function AppLayout({ children }: { children: ReactNode }) {
-  const router = useNavigate();
   const location = useLocation();
   const pathname = location.pathname;
-  const [authorized, setAuthorized] = useState(false);
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-    const token = localStorage.getItem("token");
-    const isPublicPage = pathname === "/" || pathname === "/login" || pathname === "/register";
-
-    if (!token && !isPublicPage) {
-      router("/login");
-    } else {
-      setAuthorized(true);
-    }
-  }, [pathname, router]);
-
-  // Prevent hydration mismatch by returning null until mounted
-  if (!mounted) return null;
-
-  if (!authorized) return null;
-
   const isPublicPage = pathname === "/" || pathname === "/login" || pathname === "/register";
 
   return (
@@ -46,7 +26,9 @@ export function AppLayout({ children }: { children: ReactNode }) {
           id="main-content"
           aria-label="Main content"
         >
-          {children}
+          <ErrorBoundary>
+            {children}
+          </ErrorBoundary>
         </main>
       </div>
 

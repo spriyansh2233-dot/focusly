@@ -7,7 +7,7 @@ import { H1, H2, H3, Body } from "@/components/ui/typography";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { CheckCircle, XCircle, Clock, ArrowRight, Trophy, Loader2 } from "lucide-react";
-import { submitQuiz } from "@/lib/api";
+import { submitQuiz, getQuiz } from "@/lib/api";
 import { toast } from "sonner";
 
 type QuizState = "loading" | "answering" | "feedback" | "finished";
@@ -25,24 +25,24 @@ export default function QuizPage() {
   const [startTime, setStartTime] = useState<number>(Date.now());
 
   useEffect(() => {
+    let mounted = true;
     const fetchQuestions = async () => {
       try {
-        const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:8080'}/api/quiz/concept/${conceptId}`, {
-          headers: {
-            "Authorization": `Bearer ${localStorage.getItem("token")}`,
-          },
-        });
-        if (!response.ok) throw new Error("Failed to fetch questions");
-        const data = await response.json();
-        setQuestions(data);
-        setState(data.length > 0 ? "answering" : "finished");
+        const data = await getQuiz(conceptId!);
+        if (mounted) {
+          setQuestions(data);
+          setState(data.length > 0 ? "answering" : "finished");
+        }
       } catch (error) {
-        toast.error("Failed to load questions");
-        setState("finished");
+        if (mounted) {
+          toast.error("Failed to load questions");
+          setState("finished");
+        }
       }
     };
 
     if (conceptId) fetchQuestions();
+    return () => { mounted = false; };
   }, [conceptId]);
 
   const question = questions[currentIdx];
@@ -147,35 +147,52 @@ export default function QuizPage() {
         <Card variant="elevated" className="p-8 space-y-6">
           <H2 className="leading-snug">{question.questionText}</H2>
 
-          <div className="grid gap-3">
-            {options.map((opt) => {
-              let variant = "default";
-              if (state === "feedback") {
-                if (opt === question.correctAnswer) variant = "correct";
-                else if (opt === selectedAnswer && !isCorrect) variant = "wrong";
-              }
+          {options && options.length > 0 ? (
+            <div className="grid gap-3">
+              {options.map((opt: string) => {
+                let variant = "default";
+                if (state === "feedback") {
+                  if (opt === question.correctAnswer) variant = "correct";
+                  else if (opt === selectedAnswer && !isCorrect) variant = "wrong";
+                }
 
-              return (
-                <button
-                  key={opt}
-                  onClick={() => handleSelect(opt)}
-                  disabled={state === "feedback"}
-                  className={`w-full text-left px-5 py-4 rounded-xl border transition-all duration-200 text-sm font-medium
-                    ${state === "answering" ? "hover:border-primary hover:bg-primary/5 cursor-pointer" : "cursor-default"}
-                    ${variant === "correct" ? "border-green-500 bg-green-500/10 text-green-400" : ""}
-                    ${variant === "wrong" ? "border-red-500 bg-red-500/10 text-red-400" : ""}
-                    ${variant === "default" ? "border-border/50" : ""}
-                  `}
-                >
-                  <span className="flex items-center justify-between">
-                    {opt}
-                    {variant === "correct" && <CheckCircle className="w-5 h-5 text-green-400" />}
-                    {variant === "wrong" && <XCircle className="w-5 h-5 text-red-400" />}
-                  </span>
-                </button>
-              );
-            })}
-          </div>
+                return (
+                  <button
+                    key={opt}
+                    onClick={() => handleSelect(opt)}
+                    disabled={state === "feedback"}
+                    className={`w-full text-left px-5 py-4 rounded-xl border transition-all duration-200 text-sm font-medium
+                      ${state === "answering" ? "hover:border-primary hover:bg-primary/5 cursor-pointer" : "cursor-default"}
+                      ${variant === "correct" ? "border-green-500 bg-green-500/10 text-green-400" : ""}
+                      ${variant === "wrong" ? "border-red-500 bg-red-500/10 text-red-400" : ""}
+                      ${variant === "default" ? "border-border/50" : ""}
+                    `}
+                  >
+                    <span className="flex items-center justify-between">
+                      {opt}
+                      {variant === "correct" && <CheckCircle className="w-5 h-5 text-green-400" />}
+                      {variant === "wrong" && <XCircle className="w-5 h-5 text-red-400" />}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+          ) : (
+            <div className="space-y-4">
+              <textarea 
+                className="w-full p-4 rounded-xl border border-border/50 bg-background/50 outline-none focus:border-primary focus:ring-1 focus:ring-primary min-h-[120px]"
+                placeholder="Type your answer here..."
+                disabled={state === "feedback"}
+                onChange={(e) => setSelectedAnswer(e.target.value)}
+                value={selectedAnswer || ""}
+              />
+              {state === "answering" && (
+                <Button onClick={() => handleSelect(selectedAnswer || "")} disabled={!selectedAnswer?.trim()}>
+                  Submit Answer
+                </Button>
+              )}
+            </div>
+          )}
 
           {/* Feedback Row */}
           {state === "feedback" && (

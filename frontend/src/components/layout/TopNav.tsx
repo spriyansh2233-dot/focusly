@@ -1,5 +1,6 @@
 import { Icon } from "@/components/ui/icon"
 import { Button } from "@/components/ui/button"
+import { ThemeToggle } from "@/components/theme-toggle"
 
 export function TopNav() {
   return (
@@ -8,6 +9,7 @@ export function TopNav() {
         {/* Breadcrumbs or Search could go here */}
       </div>
       <div className="flex items-center gap-4">
+        <ThemeToggle />
         <Button variant="ghost" size="icon">
           <Icon name="Bell" size={20} />
         </Button>

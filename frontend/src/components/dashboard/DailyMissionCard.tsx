@@ -4,9 +4,27 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Target, Zap, ArrowRight, Trophy } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { getPaths, getPathConcepts } from "@/lib/api";
 
 export function DailyMissionCard() {
   const router = useNavigate();
+  const [activeConceptId, setActiveConceptId] = useState<string | null>(null);
+
+  useEffect(() => {
+    getPaths()
+      .then((paths) => {
+        if (paths && paths.length > 0) {
+          getPathConcepts(paths[0].id).then((concepts) => {
+            if (concepts && concepts.length > 0) {
+              setActiveConceptId(concepts[0].id);
+            }
+          }).catch(() => {});
+        }
+      })
+      .catch(() => {});
+  }, []);
+
   // Mock data - ready for API integration
   const mission = {
     title: "Revise 10 Flashcards",
@@ -69,7 +87,7 @@ export function DailyMissionCard() {
           </div>
           
           <Button 
-            onClick={() => router("/quiz/daily-mission")}
+            onClick={() => router(activeConceptId ? `/quiz/${activeConceptId}` : "/onboarding")}
             className="w-full mt-6 rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground font-bold shadow-lg shadow-primary/20 group/btn"
           >
             Start Now 

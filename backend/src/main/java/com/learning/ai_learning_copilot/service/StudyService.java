@@ -35,14 +35,13 @@ public class StudyService {
             concept.getName(), concept.getSubject()
         );
 
-        String rawResponse = geminiService.generateContent(prompt);
         try {
-            String cleanJson = rawResponse.replaceAll("```json", "").replaceAll("```", "").trim();
-            Map<String, Object> data = new com.fasterxml.jackson.databind.ObjectMapper().readValue(cleanJson, Map.class);
-            
-            concept.setDescription((String) data.get("description"));
-            // We could store keyPoints as a JSON string in a new field, or just return them.
-            // For now, let's just save the description and return the whole object.
+            Map<String, Object> data = geminiService.generateJSONObjectContent(prompt);
+            if (data != null && data.containsKey("description")) {
+                concept.setDescription((String) data.get("description"));
+            } else {
+                concept.setDescription("Unable to generate description. Please try again.");
+            }
             return conceptRepository.save(concept);
         } catch (Exception e) {
             concept.setDescription("AI failed to generate content. Please try again later.");

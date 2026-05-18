@@ -34,6 +34,12 @@ public class NoteSummary {
     @Column(length = 1000)
     private String keywords;
 
+    @Column(columnDefinition = "TEXT")
+    private String formulas;
+
+    @Column(name = "interview_points", columnDefinition = "TEXT")
+    private String interviewPoints;
+
     @CreatedDate
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;

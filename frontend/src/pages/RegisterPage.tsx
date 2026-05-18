@@ -22,7 +22,7 @@ export default function RegisterPage() {
     try {
       await register(username, email, password);
       toast.success("Account created successfully. Please login.");
-      window.location.href = "/login";
+      router("/login");
     } catch (error: any) {
       toast.error(error.message || "Failed to register");
     } finally {

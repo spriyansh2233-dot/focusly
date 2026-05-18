@@ -50,7 +50,7 @@ export function SmartNotesCard() {
           <div className="flex-1 flex flex-col items-center justify-center text-center opacity-50">
             <p className="text-xs font-bold uppercase tracking-wider">Failed to load notes</p>
           </div>
-        ) : notes.length === 0 ? (
+        ) : !Array.isArray(notes) || notes.length === 0 ? (
           <div className="flex-1 flex flex-col items-center justify-center text-center">
             <p className="text-sm text-muted-foreground mb-4">No notes yet.</p>
             <Button variant="outline" size="sm" onClick={() => router("/notes/new")}>

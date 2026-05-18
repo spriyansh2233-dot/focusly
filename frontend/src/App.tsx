@@ -13,6 +13,7 @@ import NotesPage from './pages/NotesPage';
 import NoteDetailPage from './pages/Notes[id]Page';
 import OnboardingPage from './pages/OnboardingPage';
 import HomePage from './pages/HomePage';
+import LearnPathPage from './pages/LearnPathPage';
 import QuizConceptPage from './pages/Quiz[conceptId]Page';
 import FlashcardPage from './pages/FlashcardPage';
 import RegisterPage from './pages/RegisterPage';
@@ -40,6 +41,7 @@ function App() {
           {/* Protected Routes */}
           <Route path="/dashboard" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
           <Route path="/insights" element={<ProtectedRoute><InsightsPage /></ProtectedRoute>} />
+          <Route path="/learn/path/:pathId" element={<ProtectedRoute><LearnPathPage /></ProtectedRoute>} />
           <Route path="/learn/:conceptId" element={<ProtectedRoute><LearnConceptPage /></ProtectedRoute>} />
           <Route path="/notes" element={<ProtectedRoute><NotesPage /></ProtectedRoute>} />
           <Route path="/notes/:id" element={<ProtectedRoute><NoteDetailPage /></ProtectedRoute>} />

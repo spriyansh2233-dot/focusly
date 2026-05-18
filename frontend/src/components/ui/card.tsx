@@ -35,7 +35,7 @@ function Card({
       transition={{ duration: 0.3, ease: [0.25, 0.1, 0.25, 1.0] }}
       className={cn(
         "group/card flex flex-col gap-4 overflow-hidden rounded-xl bg-card py-4 text-sm text-card-foreground border border-border has-data-[slot=card-footer]:pb-0 has-[>img:first-child]:pt-0 data-[size=sm]:gap-3 data-[size=sm]:py-3 data-[size=sm]:has-data-[slot=card-footer]:pb-0 *:[img:first-child]:rounded-t-xl *:[img:last-child]:rounded-b-xl relative",
-        isElevated && "shadow-[0px_4px_20px_rgba(0,0,0,0.4)] border-none bg-[#252525]",
+        isElevated && "shadow-xl border-none dark:shadow-[0px_4px_20px_rgba(0,0,0,0.4)]",
         isInteractive && "cursor-pointer transition-all duration-300",
         className
       )}

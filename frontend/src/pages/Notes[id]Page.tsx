@@ -195,6 +195,22 @@ export default function NoteEditorPage({ params }: { params: Promise<{ id: strin
                         ))}
                       </div>
                     </div>
+                    {note.summary.formulas && note.summary.formulas.trim() !== "" && (
+                      <div>
+                        <h5 className="text-sm font-semibold text-primary mb-2 uppercase tracking-wider">Formulas & Key Equations</h5>
+                        <div className="text-sm space-y-2 prose prose-sm dark:prose-invert bg-secondary/30 p-4 rounded-xl">
+                           <ReactMarkdown>{note.summary.formulas}</ReactMarkdown>
+                        </div>
+                      </div>
+                    )}
+                    {note.summary.interviewPoints && note.summary.interviewPoints.trim() !== "" && (
+                      <div>
+                        <h5 className="text-sm font-semibold text-primary mb-2 uppercase tracking-wider">Interview Points</h5>
+                        <div className="text-sm space-y-2 prose prose-sm dark:prose-invert">
+                           <ReactMarkdown>{note.summary.interviewPoints}</ReactMarkdown>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </Card>
               )}

@@ -23,7 +23,7 @@ export function ActivePathsCard() {
         </CardTitle>
       </CardHeader>
       <CardContent className="p-4 flex-1">
-        {paths.length === 0 ? (
+        {!Array.isArray(paths) || paths.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-6 text-center">
             <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-primary mb-4">
               <BookOpen className="w-6 h-6" />
@@ -36,8 +36,8 @@ export function ActivePathsCard() {
           </div>
         ) : (
           <div className="space-y-4">
-            {paths.slice(0, 2).map((path) => (
-              <div key={path.id} className="border border-border/50 rounded-xl p-4 bg-secondary/30 hover:border-primary/30 transition-colors">
+            {paths.slice(0, 2).map((path: any) => (
+              <div key={path.id || Math.random()} className="border border-border/50 rounded-xl p-4 bg-secondary/30 hover:border-primary/30 transition-colors">
                 <p className="font-bold text-sm leading-tight mb-2 truncate">{path.goalDescription}</p>
                 <div className="flex items-center justify-between">
                   <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">

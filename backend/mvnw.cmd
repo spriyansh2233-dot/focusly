@@ -28,6 +28,8 @@
 @REM ----------------------------------------------------------------------------
 
 @IF "%__MVNW_ARG0_NAME__%"=="" (SET __MVNW_ARG0_NAME__=%~nx0)
+@SET JAVA_HOME=C:\Program Files\Java\jdk-21.0.11
+@SET PATH=C:\Program Files\Java\jdk-21.0.11\bin;%PATH%
 @SET __MVNW_CMD__=
 @SET __MVNW_ERROR__=
 @SET __MVNW_PSMODULEP_SAVE=%PSModulePath%

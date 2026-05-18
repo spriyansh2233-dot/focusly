@@ -18,6 +18,8 @@ import org.springframework.security.config.Customizer;
 
 import java.util.List;
 
+import org.springframework.http.HttpMethod;
+
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
@@ -55,6 +57,7 @@ public class SecurityConfig {
             .csrf(csrf -> csrf.disable())
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
+                .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                 .requestMatchers(
                     "/",
                     "/health",

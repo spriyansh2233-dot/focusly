@@ -23,7 +23,7 @@ export default function LoginPage() {
       const data = await login(email, password);
       localStorage.setItem("token", data.token);
       toast.success("Logged in successfully");
-      window.location.href = "/dashboard";
+      router("/dashboard");
     } catch (error: any) {
       toast.error(error.message || "Failed to login");
     } finally {

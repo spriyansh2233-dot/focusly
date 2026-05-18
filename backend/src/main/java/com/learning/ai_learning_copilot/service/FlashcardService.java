@@ -38,11 +38,12 @@ public class FlashcardService {
                 .orElseThrow(() -> new RuntimeException("Concept not found"));
 
         String prompt = String.format(
-            "Generate 5 high-quality flashcards for the concept: '%s'. " +
-            "Include definitions, key formulas, or memory tricks. " +
-            "Return ONLY a JSON array. Each object should have: " +
-            "'front' (string), 'back' (string), 'category' (string).",
-            concept.getTitle()
+            "You are an AI learning specialist. Generate 10 premium, high-yield, interview-ready revision flashcards for the topic: '%s'. " +
+            "Cover core concepts, standard system designs, coding patterns, formulas, memory tricks, or standard interview traps. " +
+            "The front MUST ask a clear question or prompt for a concept, and the back must provide a clear, concise, and informative answer with bullet points if helpful. " +
+            "Return ONLY a valid JSON array. Each object MUST have: " +
+            "'front' (string), 'back' (string), 'category' (string: 'DEFINITION', 'FORMULA', 'TRICK', 'INTERVIEW', or 'CONCEPT').",
+            concept.getName()
         );
 
         List<Map<String, Object>> aiCards = geminiService.generateJSONContent(prompt);

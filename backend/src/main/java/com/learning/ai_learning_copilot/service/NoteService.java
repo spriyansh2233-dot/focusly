@@ -88,21 +88,19 @@ public class NoteService {
             throw new IllegalArgumentException("Note content is empty");
         }
 
-        String prompt = "You are an AI study assistant. Read the following text and provide a summary, bullet points for revision, and key concepts. " +
+        String prompt = "You are an AI study assistant. Read the following text and provide a concise summary, bullet points for revision notes, key concepts (keywords), formulas, and interview points. " +
                 "Respond ONLY with a valid JSON object matching exactly this structure:\n" +
                 "{\n" +
-                "  \"summary\": \"A short 2-3 sentence summary.\",\n" +
-                "  \"bullet_points\": \"- Point 1\\n- Point 2\",\n" +
-                "  \"keywords\": \"keyword1, keyword2, keyword3\"\n" +
+                "  \"summary\": \"A concise 2-3 sentence summary.\",\n" +
+                "  \"bullet_points\": \"- Point 1\\n- Point 2 (Use markdown)\",\n" +
+                "  \"keywords\": \"keyword1, keyword2, keyword3\",\n" +
+                "  \"formulas\": \"- Formula 1: Explanation\\n- Formula 2 (Use markdown)\",\n" +
+                "  \"interview_points\": \"- Q1: Answer\\n- Q2 (Use markdown)\"\n" +
                 "}\n\n" +
                 "Text to summarize: \n" + note.getContent();
 
-        String aiResponse = geminiService.generateContent(prompt);
-
         try {
-            // Clean up potentially wrapped JSON response just in case the AI wraps it in ```json
-            String cleanedResponse = aiResponse.replaceAll("^```json\\s*", "").replaceAll("```$", "").trim();
-            JsonNode rootNode = objectMapper.readTree(cleanedResponse);
+            Map<String, Object> data = geminiService.generateJSONObjectContent(prompt);
 
             NoteSummary summary = note.getSummary();
             if (summary == null) {
@@ -110,13 +108,15 @@ public class NoteService {
                 summary.setNote(note);
             }
 
-            summary.setSummary(rootNode.path("summary").asText());
-            summary.setBulletPoints(rootNode.path("bullet_points").asText());
-            summary.setKeywords(rootNode.path("keywords").asText());
+            summary.setSummary((String) data.getOrDefault("summary", "No summary available."));
+            summary.setBulletPoints((String) data.getOrDefault("bullet_points", ""));
+            summary.setKeywords((String) data.getOrDefault("keywords", ""));
+            summary.setFormulas((String) data.getOrDefault("formulas", ""));
+            summary.setInterviewPoints((String) data.getOrDefault("interview_points", ""));
 
             return noteSummaryRepository.save(summary);
         } catch (Exception e) {
-            throw new RuntimeException("Failed to parse AI summary. Response was: " + aiResponse, e);
+            throw new RuntimeException("Failed to generate or parse AI summary", e);
         }
     }
 }
